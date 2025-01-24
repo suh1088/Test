@@ -3,5 +3,5 @@
 using namespace std;
 
 int main(){
-    cout << "해치웠나?";
+    cout << "해치나?";
 }
