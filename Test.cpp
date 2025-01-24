@@ -1,5 +1,7 @@
 #include <iostream>
 
-void main(){
-    cout << "hello world";
+using namespace std;
+
+int main(){
+    cout << "not hello world";
 }
