@@ -3,6 +3,9 @@
 using namespace std;
 
 int main(){
-    cout << "해치나?";
+    int n;
+    n = 19;
+    n++;
+    cout << n;
 }
 //이건 gui 사용입니다
