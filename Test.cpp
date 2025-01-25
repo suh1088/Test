@@ -1,100 +1,52 @@
-#include <iostream>
-#include <vector>
 #include <string>
-#include <algorithm>
-#include <ctime>
-#include <cmath>
-#include <queue>
-#include <unordered_map>
-#include <map>
+#include <vector>
 
 using namespace std;
-typedef long long ll;
 
-vector<int> ppl(51); // [num] , group, truth
-
-int find(int a)
-{
-    if (a != ppl[a])
-    {
-        return ppl[a] = find(ppl[a]);
-    }
-    return ppl[a];
+int TtoI(string time){
+    int It = 0;
+    It += stoi(time.substr(3,2));
+    It += stoi(time.substr(0,2)) * 60;
+    return It;
 }
 
-void merge(int a, int b)
-{
-    int x = find(a);
-    int y = find(b);
-
-    if (x != y)
-    {
-        if (x < y)
-        {
-            ppl[y] = x;
+string solution(string video_len, string pos, string op_start, string op_end, vector<string> commands) {
+    
+    int st = TtoI(op_start);
+    int en = TtoI(op_end);
+    int len = TtoI(video_len);
+    int po = TtoI(pos);
+    
+    for(int i = 0 ; i < commands.size(); i++){
+        if(po >= st && po <= en){
+            po = en;
         }
-        else
-        {
-            ppl[x] = y;
+        if(commands[i] == "prev"){
+            po -= 10;
+            if(po < 0){
+                po = 0;
+            }
+        }
+        
+        else if(commands[i] == "next"){
+            po += 10;
+            if(po > len){
+                po = len;
+            }
         }
     }
+    
+    string answer = "";
+    
+    int min = po / 60;
+    if(min < 10) answer += "0";
+    answer += to_string(min);
+    
+    answer += ":";
+    
+    int sec = po % 60;
+    if(sec < 10) answer += "0";
+    answer += to_string(sec);
+    
+    return answer;
 }
-
-int main()
-{
-    std::cin.tie(0);
-    std::ios::sync_with_stdio(0);
-
-    int n, m;
-    cin >> n >> m;
-
-    for (int i = 1; i <= n; i++)
-    {
-        ppl[i] = i;
-    }
-
-    int t;
-    cin >> t;
-    for (int i = 0; i < t; i++)
-    {
-        int tmp;
-        cin >> tmp;
-        ppl[tmp] = 0;
-    } // 2nd line end
-
-    vector<int> pty;
-
-    for (int i = 0; i < m; i++)
-    {
-        int ptppl, prev = 0, now = 0;
-        cin >> ptppl >> prev;
-
-        pty.push_back(prev);
-
-        for (int j = 1; j < ptppl; j++)
-        {
-            cin >> now;
-            merge(prev, now);
-            prev = now;
-        }
-    }
-
-    int ans = m;
-    for (int i = 0; i < m; i++)
-    {
-        if (find(pty[i]) == 0)
-        {
-            ans--;
-        }
-    }
-
-    cout << ans;
-}
-/*
-1043
-진실 공동체를 그룹으로 분류함
-만약 그룹에서 진실을 아는 사람이 적어도 한명 있으면 전부 진실
-모든 그룹원이 진실을 모른다면 전부 거짓
-
-이번엔 노트북으로 수정
-*/
