@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -49,4 +50,8 @@ string solution(string video_len, string pos, string op_start, string op_end, ve
     answer += to_string(sec);
     
     return answer;
+}
+
+int main(void){
+    cout << solution("10:55", "00:05","00:15","06:55",{"prev","next","next"});
 }
