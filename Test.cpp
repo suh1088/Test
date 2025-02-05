@@ -3,55 +3,35 @@
 #include <iostream>
 
 using namespace std;
+typedef long long ll;
 
-int TtoI(string time){
-    int It = 0;
-    It += stoi(time.substr(3,2));
-    It += stoi(time.substr(0,2)) * 60;
-    return It;
-}
+int n, m;
 
-string solution(string video_len, string pos, string op_start, string op_end, vector<string> commands) {
-    
-    int st = TtoI(op_start);
-    int en = TtoI(op_end);
-    int len = TtoI(video_len);
-    int po = TtoI(pos);
-    
-    for(int i = 0 ; i < commands.size(); i++){
-        if(po >= st && po <= en){
-            po = en;
-        }
-        if(commands[i] == "prev"){
-            po -= 10;
-            if(po < 0){
-                po = 0;
-            }
-        }
-        
-        else if(commands[i] == "next"){
-            po += 10;
-            if(po > len){
-                po = len;
-            }
-        }
+void prin(string &ans, int st, int more)
+{
+    if (more <= 0)
+    {
+        cout << ans << "\n";
+        return;
     }
-    
-    string answer = "";
-    
-    int min = po / 60;
-    if(min < 10) answer += "0";
-    answer += to_string(min);
-    
-    answer += ":";
-    
-    int sec = po % 60;
-    if(sec < 10) answer += "0";
-    answer += to_string(sec);
-    
-    return answer;
-}
 
-int main(void){
-    cout << solution("10:55", "00:05","00:15","06:55",{"prev","next","next"});
+    for (int i = st; i <= n - more + 1; i++)
+    {
+        string tmp = ans;
+        tmp += " ";
+        tmp += to_string(i);
+        prin(tmp, i + 1, more - 1);
+    }
+}
+int main(void)
+{
+
+    cin >> n >> m;
+
+    for (int i = 1; i <= n + 1 - m; i++)
+    {
+        string a = "";
+        a += to_string(i);
+        prin(a, i + 1, m - 1);
+    }
 }
