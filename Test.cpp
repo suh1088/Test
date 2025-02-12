@@ -13,84 +13,59 @@
 using namespace std;
 typedef long long ll;
 
-int spin(int want, deque<int> fdq)
-{
-    int fcnt = 0;
-    while (fdq.front() != want)
-    {
-        int temp = fdq.front();
-        fdq.pop_front();
-        fdq.push_back(temp);
-        fcnt++;
-    }
-    return fcnt;
-}
+string a, b;
 
-int cspin(int want, deque<int> sdq)
+int fill(int row, int col, vector<vector<int>> &v)
 {
-    int scnt = 0;
-    while (sdq.front() != want)
+    if (row == 0 || col == 0)
     {
-        int temp = sdq.back();
-        sdq.pop_back();
-        sdq.push_front(temp);
-        scnt++;
+        return v[row][col] = 0;
     }
-    return scnt;
+    else if (a[row] == b[col])
+    {
+        return v[row][col] = v[row - 1][col - 1] + 1;
+    }
+    else if (a[row] != b[col])
+    {
+        return v[row][col] = max(v[row][col - 1], v[row - 1][col]);
+    }
+    else
+    {
+        cout << "SOMETHING WRONG!!\n";
+        return -1;
+    }
 }
 
 int main(void)
 {
-    int N, M;
-    cin >> N >> M;
 
-    vector<int> want(M);
+    cin >> a >> b;
 
-    for (int i = 0; i < M; i++)
+    vector<vector<int>> v(a.size() + 1, vector<int>(b.size() + 1, 0));
+
+    v[0][0] = 0;
+
+    int last = 0;
+    for (int i = 0; i <= min(a.size(), b.size()); i++)
     {
-        cin >> want[i];
-    } // input ended 삭제 가능
-
-    deque<int> dq;
-    for (int i = 0; i < N; i++)
-        dq.push_back(i + 1);
-
-    int cnt;
-    for (int i = 0; i < M; i++)
-    {
-        int s = spin(want[i], dq);
-        int c = cspin(want[i], dq);
-        if (s < c)
+        // 행 먼저
+        for (int j = i; j <= b.size(); j++)
         {
-            cnt += s;
-            while (s--)
-            {
-                int temp = dq.front();
-                dq.pop_front();
-                dq.push_back(temp);
-            }
+            last = fill(j, i, v);
         }
-        else
+        // 다음 가로
+        for (int j = i + 1; j <= a.size(); j++)
         {
-            cnt += c;
-            while (c--)
-            {
-                int temp = dq.back();
-                dq.pop_back();
-                dq.push_front(temp);
-            }
+            last = fill(i, j, v);
         }
-
-        dq.pop_front();
     }
-    cout << cnt;
+
+    cout << last;
 }
 
 /*
-1021
+9251 LCS
 
-다이얼 금고
-
-빠져있는 숫자도 생각
-
+2차원 벡터 생성
+위로
 */
