@@ -8,117 +8,70 @@
 #include <unordered_map>
 #include <map>
 #include <deque>
+#include <set>
 
 using namespace std;
 typedef long long ll;
 
+int clo(int now, int want, vector<int> &dial)
+{
+    int cnt = 0;
+    while (now != want)
+    {
+        if (now > dial.size())
+            now = 0;
+        now++;
+        cnt += dial[now];
+    }
+    return cnt;
+}
+
+int coclo(int now, int want, vector<int> &dial)
+{
+    int cnt = 0;
+    while (now != want)
+    {
+        if (now < 0)
+            now = dial.size();
+        now--;
+        cnt += dial[now];
+    }
+    return cnt;
+}
+
 int main(void)
 {
-    int T;
-    cin >> T;
-    for (int i = 0; i < T; i++)
+    int N, M;
+    cin >> N >> M;
+
+    vector<int> want(M);
+    vector<int> dial(N, 1);
+    dial[0] = 0;
+
+    for (int i = 0; i < M; i++)
     {
-        string cmds;
-        int n;
-        string arr;
-        deque<int> dq;
-        bool rev = true;
-        bool error = false;
-        cin >> cmds >> n >> arr;
+        cin >> want[i];
+    } // input ended
 
-        // 2자리수 처리, 더 쉬운 방법을 찾아볼 것
-        string temp = "";
-        while (1)
-        {
-            if (arr.empty())
-            {
-                break;
-            }
-            switch (arr[0])
-            {
-            case '[':
-                arr.erase(0, 1);
-                break;
+    int now = 1;
+    int cnt = 0;
 
-            case ']':
-            case ',':
-                dq.push_back(stoi(temp));
-                temp = "";
-                arr.erase(0, 1);
-                break;
-
-            default:
-                temp.append(arr.substr(0, 1));
-                arr.erase(0, 1);
-                break;
-            }
-        }
-
-        for (int j = 0; j < cmds.size(); j++)
-        {
-            if (error)
-                break;
-            switch (cmds[j])
-            {
-            case 'R':
-                rev = !rev;
-                break;
-
-            case 'D':
-                if (dq.empty())
-                {
-                    error = true;
-                    break;
-                }
-                if (rev)
-                { // 순방향
-                    dq.pop_front();
-                }
-
-                else
-                { // 역방향
-                    dq.pop_back();
-                }
-                break;
-
-            default:
-                break;
-            }
-        } // 명령어 처리 끝
-
-        if (error)
-        {
-            // cout << "error\n";
-            continue;
-        }
-
-        string out = "[";
-        for (int j = 0; j < dq.size() - 1; j++)
-        {
-            if (rev)
-            {
-                out.append(to_string(dq.front()));
-                dq.pop_front();
-            }
-            else
-            {
-                out.append(to_string(dq.back()));
-                dq.pop_back();
-            }
-            out.append(",");
-        }
-        if (rev)
-        {
-            out.append(to_string(dq.front()));
-            dq.pop_front();
-        }
-        else
-        {
-            out.append(to_string(dq.back()));
-            dq.pop_back();
-        }
-        out.append("]");
-
-        // cout << out << "\n";
+    for (int i = 0; i < M; i++)
+    {
+        cnt += min(clo(now, want[i], dial), coclo(now, want[i], dial));
+        dial[want[i]] = 0;
+        now++;
     }
+
+    cout << cnt;
 }
+
+/*
+1021
+
+다이얼 금고
+
+빠져있는 숫자도 생각
+
+1번 풀이, deque 무식한 방법법
+*/
