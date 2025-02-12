@@ -15,48 +15,6 @@ typedef long long ll;
 
 string a, b;
 
-// int fill(int row, int col, vector<vector<int>> v)
-// {
-//     if (row == 0 || col == 0)
-//     {
-//         return v[row][col] = 0;
-//     }
-//     else if (a[row] == b[col])
-//     {
-//         return v[row][col] = v[row - 1][col - 1] + 1;
-//     }
-//     else if (a[row] != b[col])
-//     {
-//         return v[row][col] = max(v[row][col - 1], v[row - 1][col]);
-//     }
-//     else
-//     {
-//         cout << "SOMETHING WRONG!!\n";
-//         return -1;
-//     }
-// }
-
-// int fill(int row, int col, vector<vector<int>> v)
-// {
-//     if (row == 0 || col == 0)
-//     {
-//         return 0;
-//     }
-//     else if (a[row] == b[col])
-//     {
-//         return v[row - 1][col - 1] + 1;
-//     }
-//     else if (a[row] != b[col])
-//     {
-//         return max(v[row][col - 1], v[row - 1][col]);
-//     }
-//     else
-//     {
-//         cout << "SOMETHING WRONG!!\n";
-//         return -1;
-//     }
-// }
-
 int main(void)
 {
 
