@@ -13,30 +13,30 @@
 using namespace std;
 typedef long long ll;
 
-int clo(int now, int want, vector<int> &dial)
+int spin(int want, deque<int> fdq)
 {
-    int cnt = 0;
-    while (now != want)
+    int fcnt = 0;
+    while (fdq.front() != want)
     {
-        if (now > dial.size())
-            now = 0;
-        now++;
-        cnt += dial[now];
+        int temp = fdq.front();
+        fdq.pop_front();
+        fdq.push_back(temp);
+        fcnt++;
     }
-    return cnt;
+    return fcnt;
 }
 
-int coclo(int now, int want, vector<int> &dial)
+int cspin(int want, deque<int> sdq)
 {
-    int cnt = 0;
-    while (now != want)
+    int scnt = 0;
+    while (sdq.front() != want)
     {
-        if (now < 0)
-            now = dial.size();
-        now--;
-        cnt += dial[now];
+        int temp = sdq.back();
+        sdq.pop_back();
+        sdq.push_front(temp);
+        scnt++;
     }
-    return cnt;
+    return scnt;
 }
 
 int main(void)
@@ -45,24 +45,44 @@ int main(void)
     cin >> N >> M;
 
     vector<int> want(M);
-    vector<int> dial(N, 1);
-    dial[0] = 0;
 
     for (int i = 0; i < M; i++)
     {
         cin >> want[i];
-    } // input ended
+    } // input ended 삭제 가능
 
-    int now = 1;
-    int cnt = 0;
+    deque<int> dq;
+    for (int i = 0; i < N; i++)
+        dq.push_back(i + 1);
 
+    int cnt;
     for (int i = 0; i < M; i++)
     {
-        cnt += min(clo(now, want[i], dial), coclo(now, want[i], dial));
-        dial[want[i]] = 0;
-        now++;
-    }
+        int s = spin(want[i], dq);
+        int c = cspin(want[i], dq);
+        if (s < c)
+        {
+            cnt += s;
+            while (s--)
+            {
+                int temp = dq.front();
+                dq.pop_front();
+                dq.push_back(temp);
+            }
+        }
+        else
+        {
+            cnt += c;
+            while (c--)
+            {
+                int temp = dq.back();
+                dq.pop_back();
+                dq.push_front(temp);
+            }
+        }
 
+        dq.pop_front();
+    }
     cout << cnt;
 }
 
@@ -73,5 +93,4 @@ int main(void)
 
 빠져있는 숫자도 생각
 
-1번 풀이, deque 무식한 방법법
 */
