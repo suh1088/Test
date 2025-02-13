@@ -13,38 +13,43 @@
 using namespace std;
 typedef long long ll;
 
-string a, b;
+typedef struct cor
+{
+    cor(int a, int b)
+    {
+        r = a;
+        c = b;
+    }
+    int r;
+    int c;
+} cor;
 
 int main(void)
 {
+    int n, m;
+    cin >> n >> m;
 
-    cin >> a >> b;
+    vector<vector<int>> box(n, vector<int>(m, 0));
+    vector<cor> riped;
 
-    vector<vector<int>> v(a.size() + 1, vector<int>(b.size() + 1, 0));
-
-    for (int i = 1; i <= a.size(); i++)
+    int unriped = 0;
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 1; j <= b.size(); j++)
+        for (int j = 0; j < m; j++)
         {
-            if (a[i - 1] == b[j - 1])
-            {
-                v[i][j] = v[i - 1][j - 1] + 1;
-            }
-            else if (a[i - 1] != b[j - 1])
-            {
-                v[i][j] = max(v[i][j - 1], v[i - 1][j]);
-            }
-            // last = fill(j, i, v);
-            // v[j][i] = last;
+            cin >> box[i][j];
+            if (box[i][j] == 1)
+                riped.push_back(cor(i, j));
+            else if (box[i][j] == 0)
+                unriped++;
         }
     }
-
-    cout << v[a.size()][b.size()];
 }
 
 /*
-9251 LCS
+7576
 
-2차원 벡터 생성
-위로
+토마토가 들어있지 않은 칸 -1
+익은 토마토가 2개 이상인 경우 처리
+
 */
