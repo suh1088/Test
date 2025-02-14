@@ -13,56 +13,37 @@
 using namespace std;
 typedef long long ll;
 
-int n;
+deque<int> dq;
 
 int main(void)
 {
+    int n;
     cin >> n;
-    int sum = 0;
-    int Min = 4444, Max = -4444;
-    int most_frec = 0;
-    map<int, int> frec;
-    priority_queue<int> down;
-
-    for (int i = 0; i < n; i++)
+    int icut = (int)lround((double)n * 0.15);
+    while (n--)
     {
         int tmp;
         cin >> tmp;
-        sum += tmp;
-        Min = min(tmp, Min);
-        Max = max(tmp, Max);
-        frec[tmp]++;
-        most_frec = max(frec[tmp], most_frec);
-        down.push(tmp);
+        dq.push_back(tmp);
     }
-
-    double mean = (double)sum / n;
-    int p = n / 2;
-    for (int i = 0; i < p; i++)
-        down.pop();
-    int mid = down.top();
-    int range = Max - Min;
-
-    priority_queue<int, vector<int>, greater<int>> max_frecs;
-
-    for (pair i : frec)
+    sort(dq.begin(), dq.end());
+    while (icut--)
     {
-        if (i.second == most_frec)
-        {
-            max_frecs.push(i.first);
-        }
+        dq.pop_back();
+        dq.pop_front();
     }
-    max_frecs.pop();
-    int s_fr = max_frecs.top();
 
-    cout << lround(mean) << endl
-         << mid << endl
-         << s_fr << endl
-         << range;
+    int sum = 0;
+    for (int i : dq)
+    {
+        sum += i;
+    }
+    int final = (int)lround((double)sum / (dq.size()));
+    cout << final;
 }
 
 /*
-2108
+18110
 
-소수점 반올림 방법
+EZ
 */
