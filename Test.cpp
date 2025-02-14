@@ -13,43 +13,56 @@
 using namespace std;
 typedef long long ll;
 
-typedef struct cor
-{
-    cor(int a, int b)
-    {
-        r = a;
-        c = b;
-    }
-    int r;
-    int c;
-} cor;
+int n;
 
 int main(void)
 {
-    int n, m;
-    cin >> n >> m;
+    cin >> n;
+    int sum = 0;
+    int Min = 4444, Max = -4444;
+    int most_frec = 0;
+    map<int, int> frec;
+    priority_queue<int> down;
 
-    vector<vector<int>> box(n, vector<int>(m, 0));
-    vector<cor> riped;
-
-    int unriped = 0;
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < m; j++)
+        int tmp;
+        cin >> tmp;
+        sum += tmp;
+        Min = min(tmp, Min);
+        Max = max(tmp, Max);
+        frec[tmp]++;
+        most_frec = max(frec[tmp], most_frec);
+        down.push(tmp);
+    }
+
+    double mean = (double)sum / n;
+    int p = n / 2;
+    for (int i = 0; i < p; i++)
+        down.pop();
+    int mid = down.top();
+    int range = Max - Min;
+
+    priority_queue<int, vector<int>, greater<int>> max_frecs;
+
+    for (pair i : frec)
+    {
+        if (i.second == most_frec)
         {
-            cin >> box[i][j];
-            if (box[i][j] == 1)
-                riped.push_back(cor(i, j));
-            else if (box[i][j] == 0)
-                unriped++;
+            max_frecs.push(i.first);
         }
     }
+    max_frecs.pop();
+    int s_fr = max_frecs.top();
+
+    cout << lround(mean) << endl
+         << mid << endl
+         << s_fr << endl
+         << range;
 }
 
 /*
-7576
+2108
 
-토마토가 들어있지 않은 칸 -1
-익은 토마토가 2개 이상인 경우 처리
 
 */
