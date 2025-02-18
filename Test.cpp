@@ -13,100 +13,95 @@
 using namespace std;
 typedef long long ll;
 
-typedef struct cor
+typedef struct cord
 {
-    cor(int a, int b, int c)
+    int r;
+    int c;
+    cord(int row, int col)
     {
-        m = a;
-        n = b;
-        h = c;
+        r = row;
+        c = col;
     }
-    int m;
-    int n;
-    int h;
-} cor;
+} cord;
 
-int m, n, h;
-int unri = 0;
-int box[111][111][111]; // m n h (가로, 세로, 높이)
-queue<cor> riped;
-int dm[6] = {-1, 1, 0, 0, 0, 0}; // 좌우 앞뒤 상하 (사실 알빠노긴 함 ㅋㅋ)
-int dn[6] = {0, 0, -1, 1, 0, 0};
-int dh[6] = {0, 0, 0, 0, 1, -1};
+int n, m;
+cord st(0, 0);
+vector<vector<int>> v;
+vector<vector<int>> sol;
+queue<cord> que;
+int dr[4] = {1, 0, -1, 0};
+int dc[4] = {0, 1, 0, -1};
 
-bool chkin(int M, int N, int H)
+bool chkin(int r, int c)
 {
-    if (M >= 0 && M < m && N >= 0 && N < n && H >= 0 && H < h)
+    if (r < n && r >= 0 && c < m && c >= 0 && v[r][c] == 1 && sol[r][c] == 0)
         return true;
     else
         return false;
 }
 
-int bfs()
+void bfs()
 {
-    int Max = 0;
-    while (!riped.empty())
+    while (!que.empty())
     {
-        cor tmp = riped.front();
-        riped.pop();
-        for (int i = 0; i < 6; i++)
+        cord tmp = que.front();
+        que.pop();
+        int k = 4;
+        while (k--)
         {
-            int M = tmp.m + dm[i];
-            int N = tmp.n + dn[i];
-            int H = tmp.h + dh[i];
+            int nr = tmp.r + dr[k];
+            int nc = tmp.c + dc[k];
 
-            if (chkin(M, N, H))
+            if (chkin(nr, nc))
             {
-                if (box[M][N][H] == 0)
-                {
-                    box[M][N][H] = box[tmp.m][tmp.n][tmp.h] + 1;
-                    Max = max(box[M][N][H], Max);
-                    riped.push(cor(M, N, H));
-                    unri--;
-                }
+                sol[nr][nc] = sol[tmp.r][tmp.c] + 1;
+                que.push(cord(nr, nc));
             }
         }
     }
-    return Max;
 }
 
 int main(void)
 {
-
-    cin >> m >> n >> h;
-    for (int i = 0; i < h; i++)
+    cin >> n >> m;
+    v.resize(n, vector<int>(m, 0));
+    sol.resize(n, vector<int>(m, 0));
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < m; j++)
         {
-            for (int k = 0; k < m; k++)
+            int tmp;
+            cin >> tmp;
+            v[i][j] = tmp;
+            if (tmp == 2)
             {
-                int tmp;
-                cin >> tmp;
-                box[k][j][i] = tmp;
-                if (tmp == 0)
-                    unri++;
-                else if (tmp == 1)
-                    riped.push(cor(k, j, i));
+                st = cord(i, j);
             }
         }
-    } // 입력 완!
+    }
 
-    int sol = bfs();
-    if (unri > 0)
+    que.push(st);
+    bfs();
+
+    for (int i = 0; i < n; i++)
     {
-        cout << -1;
-        return 0;
+        for (int j = 0; j < m; j++)
+        {
+            if (v[i][j] == 1 && sol[i][j] == 0)
+            {
+                cout << "-1 ";
+            }
+            else
+                cout << sol[i][j] << " ";
+        }
+        cout << endl;
     }
-    else if (sol == 0)
-    {
-        cout << sol;
-    }
-    else
-        cout << sol - 1;
 }
 
 /*
-7569
+14940
 
-bfs 함수 내에 return 구문을 작성하지 않았는데, 함수 내의 while 구문에 illeagal instruction 에러가 뜸. 이유가 뭔지 모르겠음;;
+ 0은 갈 수 없는 땅이고 1은 갈 수 있는 땅, 2는 목표지점이다. 입력에서 2는 단 한개이다.
+
+ 원래 갈 수 있는 땅인 부분 중에서 도달할 수 없는 위치는 -1을 출력한다.
 */
