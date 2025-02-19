@@ -13,95 +13,76 @@
 using namespace std;
 typedef long long ll;
 
-typedef struct cord
-{
-    int r;
-    int c;
-    cord(int row, int col)
+int N, cnt = 0;
+vector<int> board; // 가능세계 (0 ~ N-1)
+
+bool chkThreat(int r, int c)
+{ // 들어오는 좌표는 가장 아래있는 퀸
+    // 가로 -> 한 줄에 한분씩 계시니까 걍 무시
+    // 세로 -> 위에서부터 체크
+    for (int i = 0; i < r; i++)
     {
-        r = row;
-        c = col;
+        if (board[i] == c)
+            return true;
     }
-} cord;
 
-int n, m;
-cord st(0, 0);
-vector<vector<int>> v;
-vector<vector<int>> sol;
-queue<cord> que;
-int dr[4] = {1, 0, -1, 0};
-int dc[4] = {0, 1, 0, -1};
-
-bool chkin(int r, int c)
-{
-    if (r < n && r >= 0 && c < m && c >= 0 && v[r][c] == 1 && sol[r][c] == 0)
-        return true;
-    else
-        return false;
-}
-
-void bfs()
-{
-    while (!que.empty())
+    // 대각 -> 양쪽 대각으로 체크
+    for (int i = r - 1; i >= 0; i--)
     {
-        cord tmp = que.front();
-        que.pop();
-        int k = 4;
-        while (k--)
+        int r_ = c + (r - i);
+        int l = c - (r - i);
+        if (l >= 0 && r_ < N)
         {
-            int nr = tmp.r + dr[k];
-            int nc = tmp.c + dc[k];
-
-            if (chkin(nr, nc))
-            {
-                sol[nr][nc] = sol[tmp.r][tmp.c] + 1;
-                que.push(cord(nr, nc));
-            }
+            if (board[i] == l || board[i] == r_)
+                return true;
+        }
+        else if (l >= 0)
+        {
+            if (board[i] == l)
+                return true;
+        }
+        else if (r_ < N)
+        {
+            if (board[i] == r_)
+                return true;
         }
     }
+
+    return false;
+}
+
+int dig(int dep)
+{
+    if (dep > N - 1)
+    {
+        cnt++;
+        return 1;
+    }
+
+    for (int i = 0; i < N; i++)
+    {
+        if (!chkThreat(dep, i))
+        {
+            board[dep] = i;
+            dig(dep + 1);
+        }
+    }
+    return 0;
 }
 
 int main(void)
 {
-    cin >> n >> m;
-    v.resize(n, vector<int>(m, 0));
-    sol.resize(n, vector<int>(m, 0));
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < m; j++)
-        {
-            int tmp;
-            cin >> tmp;
-            v[i][j] = tmp;
-            if (tmp == 2)
-            {
-                st = cord(i, j);
-            }
-        }
-    }
+    cin >> N;
+    board.resize(N, 0);
 
-    que.push(st);
-    bfs();
+    dig(0);
 
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < m; j++)
-        {
-            if (v[i][j] == 1 && sol[i][j] == 0)
-            {
-                cout << "-1 ";
-            }
-            else
-                cout << sol[i][j] << " ";
-        }
-        cout << endl;
-    }
+    cout << cnt;
 }
 
 /*
-14940
+9663
 
- 0은 갈 수 없는 땅이고 1은 갈 수 있는 땅, 2는 목표지점이다. 입력에서 2는 단 한개이다.
-
- 원래 갈 수 있는 땅인 부분 중에서 도달할 수 없는 위치는 -1을 출력한다.
+한 열에 최소 하나의 여왕님이 계셔야 함 ㅇㅇ
+ㄴ 대충 비둘기집 어쩌구
 */
