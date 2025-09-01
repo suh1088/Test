@@ -13,30 +13,38 @@
 using namespace std;
 typedef long long ll;
 
-class Node{
-    int wei;
-    int par;
-    int travel;
-    set<int> ance;
-};
+vector<int> arr = {1,2,3,4,5};
 
-int n;
-Node* root;
+int next(int idx, int max){
+    if(idx < 0){
+        return 0;
+    }
 
-
-int main(void){
-    cin >> n;
-    root = new Node[n];
-    while (n--)
-    {
-        int r, c, w;
-        cin >> r >> c >> w;
-
-        /* code */
+    if(arr[idx] + 5 - idx <= max){
+        return ++arr[idx];
     }
     
+    else{
+        int tmp = next(idx-1, max);
+        if(tmp == 0){
+            return 0;
+        }
+        arr[idx] = tmp + 1;
+        return arr[idx];
+    }
 }
 
+int main(void){
+    do{
+        for(int i = 0; i < 5; i++){
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+    }while(next(4, 10) != 0);
+    
+
+}   
+
 /*
-1967
+1753
 */
