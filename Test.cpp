@@ -13,38 +13,38 @@
 using namespace std;
 typedef long long ll;
 
-vector<int> arr = {1,2,3,4,5};
+int N, K, ans;
 
-int next(int idx, int max){
-    if(idx < 0){
-        return 0;
-    }
+// visited needed?
 
-    if(arr[idx] + 5 - idx <= max){
-        return ++arr[idx];
-    }
-    
-    else{
-        int tmp = next(idx-1, max);
-        if(tmp == 0){
-            return 0;
-        }
-        arr[idx] = tmp + 1;
-        return arr[idx];
-    }
-}
+queue<pair<int, int>> q; // pos and time
 
 int main(void){
-    do{
-        for(int i = 0; i < 5; i++){
-            cout << arr[i] << " ";
-        }
-        cout << endl;
-    }while(next(4, 10) != 0);
-    
+    cin >> N >> K;
 
+    q.push(make_pair(N, 0));
+
+    while(1){
+        pair<int, int> tmp = q.front();
+        q.pop();
+
+        if(tmp.first == K){
+            ans = tmp.second;
+            break;
+        }
+
+        else if(tmp.first < 0 || tmp.first > 100000){
+            continue;
+        }
+
+        q.push(make_pair(tmp.first - 1, tmp.second + 1));
+        q.push(make_pair(tmp.first + 1, tmp.second + 1));
+        q.push(make_pair(tmp.first * 2, tmp.second));
+    }
+
+    cout << ans;
 }   
 
 /*
-1753
+13549
 */
