@@ -15,31 +15,39 @@ typedef long long ll;
 
 int N, K, ans;
 
-// visited needed?
-
-queue<pair<int, int>> q; // pos and time
+priority_queue<pair<int, int>, greater<pair<int, int>>> q; // pos and time
 
 int main(void){
     cin >> N >> K;
 
+    if(K < N){
+        ans = N - K;
+        cout << ans;
+        return 0;
+    }
+
     q.push(make_pair(N, 0));
 
     while(1){
-        pair<int, int> tmp = q.front();
+        
+        int time = q.front().second;
+        int pos = q.front().first;
         q.pop();
 
-        if(tmp.first == K){
-            ans = tmp.second;
+        if(pos == K){
+            ans = time;
             break;
         }
 
-        else if(tmp.first < 0 || tmp.first > 100000){
-            continue;
+        if(pos-1 >= 0){
+            q.push(make_pair(pos - 1, time + 1));
         }
-
-        q.push(make_pair(tmp.first - 1, tmp.second + 1));
-        q.push(make_pair(tmp.first + 1, tmp.second + 1));
-        q.push(make_pair(tmp.first * 2, tmp.second));
+        if(pos < K){
+            q.push(make_pair(pos + 1, time + 1));
+        }
+        if(pos < K){
+            q.push(make_pair(pos * 2, time));
+        }
     }
 
     cout << ans;
@@ -47,4 +55,11 @@ int main(void){
 
 /*
 13549
+
+걷는 경우 거리 계산 쉬움
+순간이동 할 경우 가능한 횟수 그리 많지 않음
+
+걷기랑 점멸 랜덤하게 섞인경우?
+
+
 */
