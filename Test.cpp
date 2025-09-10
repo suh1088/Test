@@ -13,53 +13,72 @@
 using namespace std;
 typedef long long ll;
 
-int N, K, ans;
+int N, M; // 도시 크기, 
+// vector<vector<int>> town;
+vector<pair<int, int>> kfc;
+vector<pair<int, int>> home;
 
-priority_queue<pair<int, int>, greater<pair<int, int>>> q; // pos and time
+int sol = 0x7FFFFFFF;
+
+int caldis(pair<int, int> a, pair<int, int> b){
+    return abs(a.first - b.first) + abs(a.second - b.second);
+}
+
+void fmin(vector<int>& comb){ // 살릴 치킨집의 idx
+    int chkdis = 0;
+    
+    for(pair<int, int> h : home){
+        int dis = 0x7FFFFFFF;
+        for(int i : comb){
+            dis = min(caldis(h, kfc[i]), dis);
+        }
+        chkdis += dis;
+    }
+    sol = min(sol, chkdis);
+    
+}
+
+void fcomb(int st, vector<int>& comb){
+    if(comb.size() == M){
+        fmin(comb);
+    }
+
+    for(int i = st; i < kfc.size(); i++){
+        comb.push_back(i);
+        fcomb(i + 1, comb);
+        comb.pop_back();
+    }
+}
 
 int main(void){
-    cin >> N >> K;
+    // ios::sync_with_stdio(false); 
+    // cin.tie(NULL);
 
-    if(K < N){
-        ans = N - K;
-        cout << ans;
-        return 0;
-    }
+    cin >> N >> M;
 
-    q.push(make_pair(N, 0));
+    for(int i = 1; i <= N; i++){
+        for(int j = 1; j <= N; j++){
+            int tmp;
+            cin >> tmp;
 
-    while(1){
-        
-        int time = q.front().second;
-        int pos = q.front().first;
-        q.pop();
-
-        if(pos == K){
-            ans = time;
-            break;
-        }
-
-        if(pos-1 >= 0){
-            q.push(make_pair(pos - 1, time + 1));
-        }
-        if(pos < K){
-            q.push(make_pair(pos + 1, time + 1));
-        }
-        if(pos < K){
-            q.push(make_pair(pos * 2, time));
+            if(tmp == 1){
+                home.push_back(make_pair(i,j));
+            }
+            else if(tmp == 2){
+                kfc.push_back(make_pair(i,j));
+            }
         }
     }
 
-    cout << ans;
-}   
+    // input compl
+    vector<int> comb;
+
+    fcomb(0, comb);
+
+    cout << sol;
+}
 
 /*
-13549
-
-걷는 경우 거리 계산 쉬움
-순간이동 할 경우 가능한 횟수 그리 많지 않음
-
-걷기랑 점멸 랜덤하게 섞인경우?
-
+11660
 
 */
