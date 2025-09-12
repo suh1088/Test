@@ -13,72 +13,76 @@
 using namespace std;
 typedef long long ll;
 
-int N, M; // 도시 크기, 
-// vector<vector<int>> town;
-vector<pair<int, int>> kfc;
-vector<pair<int, int>> home;
+int N, acidx; // 
+int curmin = 0x7FFFFFFF;
+int c1, c2;
+vector<int> liq;
 
-int sol = 0x7FFFFFFF;
-
-int caldis(pair<int, int> a, pair<int, int> b){
-    return abs(a.first - b.first) + abs(a.second - b.second);
-}
-
-void fmin(vector<int>& comb){ // 살릴 치킨집의 idx
-    int chkdis = 0;
-    
-    for(pair<int, int> h : home){
-        int dis = 0x7FFFFFFF;
-        for(int i : comb){
-            dis = min(caldis(h, kfc[i]), dis);
-        }
-        chkdis += dis;
-    }
-    sol = min(sol, chkdis);
-    
-}
-
-void fcomb(int st, vector<int>& comb){
-    if(comb.size() == M){
-        fmin(comb);
-    }
-
-    for(int i = st; i < kfc.size(); i++){
-        comb.push_back(i);
-        fcomb(i + 1, comb);
-        comb.pop_back();
-    }
-}
 
 int main(void){
     // ios::sync_with_stdio(false); 
     // cin.tie(NULL);
 
-    cin >> N >> M;
 
-    for(int i = 1; i <= N; i++){
-        for(int j = 1; j <= N; j++){
-            int tmp;
-            cin >> tmp;
+    cin >> N;
+    liq.resize(N, 0);
+    bool flag = true;
 
-            if(tmp == 1){
-                home.push_back(make_pair(i,j));
-            }
-            else if(tmp == 2){
-                kfc.push_back(make_pair(i,j));
-            }
+    for(int i = 0; i < N; i++){
+        cin >> liq[i];
+        if(flag && liq[i] > 0){
+            acidx = i;
+            flag = false;
         }
     }
 
-    // input compl
-    vector<int> comb;
+    
+    
+    if(acidx > 1 && abs(liq[acidx - 1] + liq[acidx - 2]) < curmin){
+        c2 = acidx - 1;
+        c1 = acidx - 2;
+        curmin = abs(liq[acidx - 1] + liq[acidx - 2]);
+    }
+    if(acidx < N-1 && abs(liq[acidx] + liq[acidx + 1]) < curmin){
+        c1 = acidx;
+        c2 = acidx + 1;
+        curmin = abs(liq[acidx] + liq[acidx + 1]);
+    }
 
-    fcomb(0, comb);
+    int a = 0, b = N - 1;
+    while(a < b){
+        if(abs(liq[a] + liq[b]) < curmin){
+            c1 = a;
+            c2 = b;
+            curmin = abs(liq[a] + liq[b]);
+        }
 
-    cout << sol;
+        if(liq[a] + liq[b] > 0){
+            b--;
+        }
+        else if(liq[a] + liq[b] < 0){
+            a++;
+        }
+        else{
+            c1 = a;
+            c2 = b;
+            break;
+        }
+    }
+
+    cout << liq[c1] << " " << liq[c2];
+
 }
 
 /*
-11660
+2467
+
+1. 이성애
+
+2. 동성애-
+ㄴ 무조건 -1 -2
+
+3. 동성애+
+ㄴ 무조건 +0 +1
 
 */
