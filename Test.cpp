@@ -13,76 +13,55 @@
 using namespace std;
 typedef long long ll;
 
-int N, acidx; // 
-int curmin = 0x7FFFFFFF;
-int c1, c2;
-vector<int> liq;
+int V, E;
+vector<vector<pair<int,int>>> v;
+priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+vector<bool> vis;
 
+int ans = 0;
 
 int main(void){
     // ios::sync_with_stdio(false); 
     // cin.tie(NULL);
 
-
-    cin >> N;
-    liq.resize(N, 0);
-    bool flag = true;
-
-    for(int i = 0; i < N; i++){
-        cin >> liq[i];
-        if(flag && liq[i] > 0){
-            acidx = i;
-            flag = false;
-        }
-    }
-
+    cin >> V >> E;
+    v.resize(V+1);
+    vis.resize(V+1, false);
     
-    
-    if(acidx > 1 && abs(liq[acidx - 1] + liq[acidx - 2]) < curmin){
-        c2 = acidx - 1;
-        c1 = acidx - 2;
-        curmin = abs(liq[acidx - 1] + liq[acidx - 2]);
-    }
-    if(acidx < N-1 && abs(liq[acidx] + liq[acidx + 1]) < curmin){
-        c1 = acidx;
-        c2 = acidx + 1;
-        curmin = abs(liq[acidx] + liq[acidx + 1]);
+    for(int i = 0; i < E; i++){
+        int a, b, c;
+        cin >> a >> b >> c;
+
+        v[a].push_back(make_pair(b, c));
+        v[b].push_back(make_pair(a, c));
     }
 
-    int a = 0, b = N - 1;
-    while(a < b){
-        if(abs(liq[a] + liq[b]) < curmin){
-            c1 = a;
-            c2 = b;
-            curmin = abs(liq[a] + liq[b]);
+    pq.push(make_pair(0, 1));
+
+    while(!pq.empty()){
+        int cnode =pq.top().second;
+        int dis = pq.top().first;
+        pq.pop();
+        if(vis[cnode]){
+            continue;
         }
 
-        if(liq[a] + liq[b] > 0){
-            b--;
+        vis[cnode] = true;
+        ans += dis;
+        
+
+        for(pair<int, int> p : v[cnode]){
+            if(!vis[p.first]){
+                pq.push(make_pair(p.second, p.first));
+            }
         }
-        else if(liq[a] + liq[b] < 0){
-            a++;
-        }
-        else{
-            c1 = a;
-            c2 = b;
-            break;
-        }
+
     }
 
-    cout << liq[c1] << " " << liq[c2];
-
+    cout << ans;
 }
 
 /*
-2467
-
-1. 이성애
-
-2. 동성애-
-ㄴ 무조건 -1 -2
-
-3. 동성애+
-ㄴ 무조건 +0 +1
+1106
 
 */
