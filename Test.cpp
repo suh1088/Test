@@ -13,85 +13,52 @@
 using namespace std;
 typedef long long ll;
 
-int N;
-vector<vector<int>> plate;
-map<int, bool> av1; // 차 일정
-map<int, bool> av2; // 합 일정
-vector<int> best(2,0);
+int N, S, idx = 0x7FFFFFFF;
 
-bool chk(int x, int y){
-    bool tmp = true;
-    if(x < 0 || x >= N) tmp = false;
-    if(y < 0 || y >= N) tmp = false;
-    return tmp;
-}
-
-int sol(int dia, int bish, int col){
-
-    if(dia > N*2 - 1){
-        best[col] = max(bish, best[col]);
-        return bish;
-    } // ending
-
-    int x, y;
-    if(dia < N){
-        x = dia;
-        y = 0;
-    }
-    else{
-        x = N-1;
-        y = dia - N + 1;
-    } // find first pos
-
-    while(chk(x, y)){
-
-        if(plate[x][y] == 1 && av1[x-y] && av2[x+y]){
-            plate[x][y] = 2;
-            av1[x-y] = false;
-            av2[x+y] = false;
-
-            sol(dia + 2, bish + 1, col);
-
-            plate[x][y] = 1;
-            av1[x-y] = true;
-            av2[x+y] = true;
-        }
-
-        x--;
-        y++;
-    }
-    // 배치하지 않고 넘어가는 경우
-    sol(dia + 2, bish, col);
-
-    return bish;
-
-}
+vector<int> arr;
 
 int main(void){
-    // ios::sync_with_stdio(false); 
-    // cin.tie(NULL);
+    ios::sync_with_stdio(false); 
+    cin.tie(NULL);
 
-    cin >> N;
-    plate.resize(N, vector<int>(N));
-    
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            cin >> plate[i][j];
-            av1[i-j] = true;
-            av2[i+j] = true;
+    cin >> N >> S;
+
+    arr.resize(N+1, 0);
+    for(int i = 1; i <= N; i++){
+        int tmp;
+        cin >> tmp;
+        arr[i] = tmp + arr[i-1];
+
+        if(arr[i] >= S){
+            idx = min(idx, i);
         }
     }
 
-    //sol(0,0)
-    sol(0, 0, 0);
-    sol(1, 0, 1);
-    cout << best[0] + best[1];
+    if(idx == 0x7FFFFFFF){
+        cout << 0;
+        return 0;
+    }
 
+    int m = 0x7FFFFFFF;
+
+    int st = 0, en = 0;
+    while(en <= N){
+        if(arr[en] - arr[st] >= S){
+            m = min(m, en - st);
+            st++;
+        }
+        else{
+            en++;
+        }
+    }
+
+    cout << m;
 }
 
 /*
-1799 
+1806
 
-와 씨 하루종일 고민해서 결국 풀었다
-다시 짚어보면 막 그렇게까지 어렵지는 않은데 실력 부족 이슈
+투 포인터
+포인터 두개를 가지고, 가능한 방법을 향해 움직임
+저번에 풀었던 용액 문제와 비슷
 */
