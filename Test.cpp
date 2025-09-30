@@ -13,52 +13,69 @@
 using namespace std;
 typedef long long ll;
 
-int N, S, idx = 0x7FFFFFFF;
-
-vector<int> arr;
+int N, M;
+bool impos= false;
+vector<vector<int>> order; // 개선 가능
+vector<int> wait;
 
 int main(void){
     ios::sync_with_stdio(false); 
     cin.tie(NULL);
 
-    cin >> N >> S;
+    cin >> N >> M;
+    order.resize(N+1);
+    wait.resize(N+1, 0);
+    for(int i = 0; i < M; i++){
+        int n, a, b;
+        cin >> n >> a;
+        for(int j = 1; j < n; j++){
+            cin >> b;
 
-    arr.resize(N+1, 0);
+            // if(find(order[a].begin(), order[a].end(), b) == order[a].end()){
+            //     wait[b]++;
+            // }
+            wait[b]++;
+            order[a].push_back(b);
+
+            a = b;
+        }
+    }
+    // input done
+
+    vector<int> ans;
+
+    queue<int> q;
     for(int i = 1; i <= N; i++){
-        int tmp;
-        cin >> tmp;
-        arr[i] = tmp + arr[i-1];
-
-        if(arr[i] >= S){
-            idx = min(idx, i);
+        if(wait[i] == 0){
+            q.push(i);
         }
     }
 
-    if(idx == 0x7FFFFFFF){
+    while(!q.empty()){
+        int cur = q.front();
+        q.pop();
+        wait[cur] = -1;
+        for(int i : order[cur]){
+            wait[i]--;
+            if(wait[i] == 0){
+                q.push(i);
+            }
+        }
+        ans.push_back(cur);
+    }
+    
+    if(ans.size() == N){
+        for(int i : ans){
+            cout << i << "\n";
+        }
+    }
+    else{
         cout << 0;
-        return 0;
     }
-
-    int m = 0x7FFFFFFF;
-
-    int st = 0, en = 0;
-    while(en <= N){
-        if(arr[en] - arr[st] >= S){
-            m = min(m, en - st);
-            st++;
-        }
-        else{
-            en++;
-        }
-    }
-
-    cout << m;
 }
 
 /*
-1806
+2623
 
-투 포인터
-포인터 두개를 가지고, 가능한 방법을 향해 움직임
-저번에 풀었던 용액 문제와 비슷
+
 */
