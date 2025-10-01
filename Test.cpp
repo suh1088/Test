@@ -13,69 +13,64 @@
 using namespace std;
 typedef long long ll;
 
-int N, M;
-bool impos= false;
-vector<vector<int>> order; // 개선 가능
-vector<int> wait;
+int N, fin, Min = 0x7FFFFFFF;
+vector<vector<int>> wei;
+vector<vector<int>> cost; // cur and situ
+
+int bits_(int n){
+    return 1 << n;
+}
+
+int dfs(int cur, int sit){
+    if(sit == fin){
+        if(wei[cur][0]){
+            return wei[cur][0];
+        }
+        return 0x7FFFFFFF;
+    }
+
+    if(cost[cur][sit] != 0){
+        return cost[cur][sit];
+    }
+
+    // sit |= bits_(cur);
+    // cost[cur][sit] = c;
+
+    int result = 0x7FFFFFFF;
+
+    for(int i = 0; i < N; i++){
+        int c;
+        if(wei[cur][i] && !(sit&bits_(i))){
+            c = dfs(i, sit | bits_(i));
+            if(c != 0x7FFFFFFF){
+                result = min(result, c + wei[cur][i]);
+            }
+        }
+    }
+    cost[cur][sit] = result;
+    return result;
+}
 
 int main(void){
     ios::sync_with_stdio(false); 
     cin.tie(NULL);
 
-    cin >> N >> M;
-    order.resize(N+1);
-    wait.resize(N+1, 0);
-    for(int i = 0; i < M; i++){
-        int n, a, b;
-        cin >> n >> a;
-        for(int j = 1; j < n; j++){
-            cin >> b;
-
-            // if(find(order[a].begin(), order[a].end(), b) == order[a].end()){
-            //     wait[b]++;
-            // }
-            wait[b]++;
-            order[a].push_back(b);
-
-            a = b;
+    cin >> N;
+    wei.resize(N, vector<int>(N, 0));
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            cin >> wei[i][j];
         }
     }
-    // input done
+    fin = (1 << N) - 1;
 
-    vector<int> ans;
+    cost.resize(N, vector<int>(fin+1, 0));
 
-    queue<int> q;
-    for(int i = 1; i <= N; i++){
-        if(wait[i] == 0){
-            q.push(i);
-        }
-    }
-
-    while(!q.empty()){
-        int cur = q.front();
-        q.pop();
-        wait[cur] = -1;
-        for(int i : order[cur]){
-            wait[i]--;
-            if(wait[i] == 0){
-                q.push(i);
-            }
-        }
-        ans.push_back(cur);
-    }
+    cout << dfs(0,1);
     
-    if(ans.size() == N){
-        for(int i : ans){
-            cout << i << "\n";
-        }
-    }
-    else{
-        cout << 0;
-    }
 }
 
 /*
-2623
-
+2098
 
 */
