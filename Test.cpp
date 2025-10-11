@@ -13,64 +13,49 @@
 using namespace std;
 typedef long long ll;
 
-int N, fin, Min = 0x7FFFFFFF;
-vector<vector<int>> wei;
-vector<vector<int>> cost; // cur and situ
-
-int bits_(int n){
-    return 1 << n;
-}
-
-int dfs(int cur, int sit){
-    if(sit == fin){
-        if(wei[cur][0]){
-            return wei[cur][0];
-        }
-        return 0x7FFFFFFF;
-    }
-
-    if(cost[cur][sit] != 0){
-        return cost[cur][sit];
-    }
-
-    // sit |= bits_(cur);
-    // cost[cur][sit] = c;
-
-    int result = 0x7FFFFFFF;
-
-    for(int i = 0; i < N; i++){
-        int c;
-        if(wei[cur][i] && !(sit&bits_(i))){
-            c = dfs(i, sit | bits_(i));
-            if(c != 0x7FFFFFFF){
-                result = min(result, c + wei[cur][i]);
-            }
-        }
-    }
-    cost[cur][sit] = result;
-    return result;
-}
+int N, K;
+ll pri = 0;
+priority_queue<pair<int, int>> gem;
+multiset<int> bags;
 
 int main(void){
     ios::sync_with_stdio(false); 
     cin.tie(NULL);
 
-    cin >> N;
-    wei.resize(N, vector<int>(N, 0));
+    cin >> N >> K;
+    
     for(int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            cin >> wei[i][j];
+        int m, v;
+        cin >> m >> v;
+        gem.push(make_pair(v, m));
+    }
+    for(int i = 0; i < K; i++){
+        int c;
+        cin >> c;
+        bags.insert(c);
+    }
+
+    while(!gem.empty()){
+        pair<int, int> cgem = gem.top();
+        int cm = cgem.second;
+
+        auto it = bags.lower_bound(cm);
+        if(it != bags.end()){
+            pri += cgem.first;
+            gem.pop();
+            bags.erase(it);
+        }
+        else{
+            gem.pop();
         }
     }
-    fin = (1 << N) - 1;
 
-    cost.resize(N, vector<int>(fin+1, 0));
-
-    cout << dfs(0,1);
-    
+    cout << pri;
 }
 
 /*
-2098
+1202
 
+정렬하고 이진탐색 할바엔 그냥 멀티셋 쓰세요 제발....
+이 간단한걸 지금까지 나만 몰랐네 ㅠㅠ
 */
