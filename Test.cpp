@@ -13,61 +13,86 @@
 using namespace std;
 typedef long long ll;
 
-vector<pair<int, int>> obj;
-vector<vector<int>> dp;
-int N, W;
+int N, M;
+vector<int> arr;
+vector<int> odd;
+vector<int> even; // idx + 0.5 == real idx
 
-int fill(int n, int w)
+void input()
 {
-    if (n == 0)
+    cin >> N;
+    arr.resize(N + 1, 0);
+    odd.resize(N + 1, 0);
+    even.resize(N + 1, 0);
+    for (int i = 1; i <= N; i++)
     {
-        if (w >= obj[n].first)
-        {
-            return obj[n].second;
-        }
-        else
-        {
-            return 0;
-        }
+        cin >> arr[i];
     }
-
-    if (w < obj[n].first)
-    {
-        return dp[w][n - 1];
-    }
-    else
-    {
-        return max(dp[w][n - 1], obj[n].second + dp[w - obj[n].first][n - 1]);
-    }
+    cin >> M;
 }
 
 int main(void)
 {
-    // ios_base::sync_with_stdio(false);
-    // cin.tie(NULL);
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
 
-    cin >> N >> W;
+    input();
 
-    dp.resize(W + 1, vector<int>(N, 0));
-
-    for (int i = 0; i < N; i++)
+    for (int i = 1; i <= N; i++)
     {
-        int a, b; // w and v
-        cin >> a >> b;
-        obj.push_back(make_pair(a, b));
+        int l = i - 1, r = i + 1;
+        int len = 1;
+        while (arr[l--] == arr[r++])
+        {
+            len += 2;
+        }
+        odd[i] = len;
     }
 
-    for (int i = 0; i < N; i++)
+    for (int i = 1; i < N; i++)
     {
-        for (int j = 0; j <= W; j++)
+        int l = i, r = i + 1;
+        int len = 0;
+        while (arr[l--] == arr[r++])
         {
-            dp[j][i] = fill(i, j);
+            len += 2;
+        }
+        even[i] = len;
+    }
+
+    for (int i = 0; i < M; i++)
+    {
+        int a, b;
+        cin >> a >> b;
+
+        if ((b - a) % 2 == 0)
+        { // use odd
+            int idx = (a + b) / 2;
+            if (odd[idx] > (b - a) + 1)
+            {
+                cout << "1\n";
+            }
+            else
+            {
+                cout << "0\n";
+            }
+        }
+        else
+        { // use even
+            int idx = (a + b) / 2;
+            if (even[idx] > (b - a) + 1)
+            {
+                cout << "1\n";
+            }
+            else
+                cout << "0\n";
         }
     }
-
-    cout << dp[W][N - 1];
 }
 
 /*
-12865
+1202
+
+정렬하고 이진탐색 할바엔 그냥 멀티셋 쓰세요 제발....
+이 간단한걸 지금까지 나만 몰랐네 ㅠㅠ
 */
