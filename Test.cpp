@@ -68,7 +68,7 @@ int main(void)
         if ((b - a) % 2 == 0)
         { // use odd
             int idx = (a + b) / 2;
-            if (odd[idx] > (b - a) + 1)
+            if (odd[idx] >= (b - a) + 1)
             {
                 cout << "1\n";
             }
@@ -80,7 +80,7 @@ int main(void)
         else
         { // use even
             int idx = (a + b) / 2;
-            if (even[idx] > (b - a) + 1)
+            if (even[idx] >= (b - a) + 1)
             {
                 cout << "1\n";
             }
@@ -91,8 +91,9 @@ int main(void)
 }
 
 /*
-1202
+10942
 
-정렬하고 이진탐색 할바엔 그냥 멀티셋 쓰세요 제발....
-이 간단한걸 지금까지 나만 몰랐네 ㅠㅠ
+질문의 수에서 심상치 않음을 느꼈어야 함
+
+별로 어렵지 않은 문제
 */
