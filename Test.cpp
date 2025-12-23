@@ -14,21 +14,40 @@ using namespace std;
 typedef long long ll;
 
 int N, M;
-vector<int> arr;
-vector<int> odd;
-vector<int> even; // idx + 0.5 == real idx
+vector<int> par;
+int Fcycle = 0;
 
-void input()
-{
-    cin >> N;
-    arr.resize(N + 1, 0);
-    odd.resize(N + 1, 0);
-    even.resize(N + 1, 0);
-    for (int i = 1; i <= N; i++)
+int find(int a)
+{ // return root
+    if (par[a] == a)
     {
-        cin >> arr[i];
+        return a;
     }
-    cin >> M;
+    else
+    {
+        return par[a] = find(par[a]);
+    }
+}
+
+int uni(int a, int b)
+{
+    if (find(a) != find(b))
+    {
+        par[par[a]] = par[b];
+    }
+
+    return 0;
+}
+
+int input()
+{
+    cin >> N >> M;
+    par.resize(N, 0);
+    for (int i = 0; i < N; i++)
+    {
+        par[i] = i;
+    }
+    return 0;
 }
 
 int main(void)
@@ -38,62 +57,27 @@ int main(void)
 
     input();
 
-    for (int i = 1; i <= N; i++)
-    {
-        int l = i - 1, r = i + 1;
-        int len = 1;
-        while (arr[l--] == arr[r++])
-        {
-            len += 2;
-        }
-        odd[i] = len;
-    }
-
-    for (int i = 1; i < N; i++)
-    {
-        int l = i, r = i + 1;
-        int len = 0;
-        while (arr[l--] == arr[r++])
-        {
-            len += 2;
-        }
-        even[i] = len;
-    }
-
-    for (int i = 0; i < M; i++)
+    for (int i = 1; i <= M; i++)
     {
         int a, b;
         cin >> a >> b;
 
-        if ((b - a) % 2 == 0)
-        { // use odd
-            int idx = (a + b) / 2;
-            if (odd[idx] >= (b - a) + 1)
-            {
-                cout << "1\n";
-            }
-            else
-            {
-                cout << "0\n";
-            }
+        if (find(a) == find(b) && Fcycle == 0)
+        {
+            Fcycle = i;
+            // break;
         }
         else
-        { // use even
-            int idx = (a + b) / 2;
-            if (even[idx] >= (b - a) + 1)
-            {
-                cout << "1\n";
-            }
-            else
-                cout << "0\n";
+        {
+            uni(a, b);
         }
     }
+
+    cout << Fcycle;
 }
 
 /*
-10942
+20040
 
-질문의 수에서 심상치 않음을 느꼈어야 함
-
-별로 어렵지 않은 문제
+유니온 파인드 알면 별로 어렵진 않은데 실수한거 있어서 오래걸린듯
 */
