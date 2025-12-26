@@ -10,42 +10,29 @@
 #include <deque>
 #include <set>
 
+#define IMAX 0x7FFFFFFF
+
 using namespace std;
 typedef long long ll;
 
-int N, M;
-vector<int> par;
-int Fcycle = 0;
-
-int find(int a)
-{ // return root
-    if (par[a] == a)
-    {
-        return a;
-    }
-    else
-    {
-        return par[a] = find(par[a]);
-    }
-}
-
-int uni(int a, int b)
-{
-    if (find(a) != find(b))
-    {
-        par[par[a]] = par[b];
-    }
-
-    return 0;
-}
+int N;
+vector<int> p(501);
+vector<vector<int>> dp(501, vector<int>(501, IMAX));
 
 int input()
 {
-    cin >> N >> M;
-    par.resize(N, 0);
+    cin >> N;
+    int a;
     for (int i = 0; i < N; i++)
     {
-        par[i] = i;
+        cin >> p[i];
+        cin >> a;
+    }
+    p[N] = a;
+
+    for (int i = 0; i <= 500; i++)
+    {
+        dp[i][i] = 0;
     }
     return 0;
 }
@@ -57,27 +44,30 @@ int main(void)
 
     input();
 
-    for (int i = 1; i <= M; i++)
+    for (int l = 2; l <= N; l++)
     {
-        int a, b;
-        cin >> a >> b;
+        for (int i = 0; i < N - l + 1; i++)
+        {
+            int j = i + l - 1;
 
-        if (find(a) == find(b) && Fcycle == 0)
-        {
-            Fcycle = i;
-            // break;
-        }
-        else
-        {
-            uni(a, b);
+            for (int k = i; k < j; k++)
+            {
+                // Ai~Ak * Ak+1~Aj
+                int tmp = dp[i][k] + dp[k + 1][j] + p[i] * p[k + 1] * p[j + 1];
+                if (dp[i][j] > tmp)
+                {
+                    dp[i][j] = tmp;
+                }
+            }
         }
     }
 
-    cout << Fcycle;
+    cout << dp[0][N - 1];
 }
 
 /*
-20040
+11049
 
-유니온 파인드 알면 별로 어렵진 않은데 실수한거 있어서 오래걸린듯
+학교에서 배운 dp 문제
+
 */
