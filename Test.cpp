@@ -15,26 +15,92 @@
 using namespace std;
 typedef long long ll;
 
-int N;
-vector<int> p(501);
-vector<vector<int>> dp(501, vector<int>(501, IMAX));
-
-int input()
+struct r
 {
-    cin >> N;
-    int a;
-    for (int i = 0; i < N; i++)
-    {
-        cin >> p[i];
-        cin >> a;
-    }
-    p[N] = a;
+    int a, b, c;
 
-    for (int i = 0; i <= 500; i++)
+    r(int a, int b, int c) : a(a), b(b), c(c) {};
+
+    bool operator<(const r &other) const
     {
-        dp[i][i] = 0;
+        return this->c > other.c;
     }
-    return 0;
+};
+
+int N, M;
+vector<int> p;
+priority_queue<r> pq;
+int cost = 0;
+int mc = 0;
+
+void input()
+{
+    cin >> N >> M;
+
+    p.resize(N + 1, 0);
+
+    for (int i = 0; i <= N; i++)
+    {
+        p[i] = i;
+    }
+
+    for (int i = 0; i < M; i++)
+    {
+        int a, b, c;
+        cin >> a >> b >> c;
+        pq.push(r(a, b, c));
+    }
+}
+
+int find(int a)
+{
+    if (p[a] == a)
+    {
+        return a;
+    }
+    return p[a] = find(p[a]);
+}
+
+int ss(int a, int b)
+{
+    return find(a) == find(b);
+}
+
+int uni(int a, int b)
+{
+    if (ss(a, b))
+    {
+        return 0;
+    }
+    else
+    {
+        p[find(a)] = find(b);
+        return 1;
+    }
+}
+
+void kruskal()
+{
+
+    while (!pq.empty())
+    {
+        r tmpr = pq.top();
+        int a = tmpr.a;
+        int b = tmpr.b;
+        int c = tmpr.c;
+        pq.pop();
+
+        if (uni(a, b))
+        {
+            cost += c;
+            if (mc < c)
+            {
+                mc = c;
+            }
+        }
+    }
+
+    cost -= mc;
 }
 
 int main(void)
@@ -44,30 +110,13 @@ int main(void)
 
     input();
 
-    for (int l = 2; l <= N; l++)
-    {
-        for (int i = 0; i < N - l + 1; i++)
-        {
-            int j = i + l - 1;
+    kruskal();
 
-            for (int k = i; k < j; k++)
-            {
-                // Ai~Ak * Ak+1~Aj
-                int tmp = dp[i][k] + dp[k + 1][j] + p[i] * p[k + 1] * p[j + 1];
-                if (dp[i][j] > tmp)
-                {
-                    dp[i][j] = tmp;
-                }
-            }
-        }
-    }
-
-    cout << dp[0][N - 1];
+    cout << cost;
 }
 
 /*
-11049
+1647
 
-학교에서 배운 dp 문제
-
+최소 스패닝 트리를 찾은 뒤에 가장 비싼 길을 제거?
 */
