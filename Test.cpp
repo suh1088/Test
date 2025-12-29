@@ -16,55 +16,78 @@
 using namespace std;
 typedef long long ll;
 
-int N, M;
-vector<int> ind;
-vector<vector<int>> deg;
-priority_queue<int, vector<int>, greater<int>> pq;
+int V;
+vector<vector<pair<int, int>>> tree;
+// vector<vector<int>> dist;
+vector<int> totd;
+int maxdist = 0;
 
 void input()
 {
-    cin >> N >> M;
+    cin >> V;
+    tree.resize(V + 1);
+    // dist.resize(V + 1, vector<int>(V + 1));
 
-    ind.resize(N + 1, 0);
-    deg.resize(N + 1);
-
-    for (int i = 0; i < M; ++i)
+    for (int i = 1; i <= V; i++)
     {
-        int a, b;
-        cin >> a >> b;
-        ind[b]++;
-        deg[a].push_back(b);
-    }
+        int s;
+        cin >> s;
 
-    for (int i = 1; i <= N; i++)
-    {
-        if (ind[i] == 0)
+        int to, d;
+        while (1)
         {
-            pq.push(i);
+            cin >> to;
+            if (to == -1)
+                break;
+
+            cin >> d;
+            tree[s].push_back(make_pair(to, d));
+            // dist[s][to] = d;
         }
     }
 }
 
-void solve()
-{
-    while (!pq.empty())
+int bfs(int st)
+{ // return deepest node
+    queue<int> q;
+    q.push(st);
+    int deepest;
+
+    while (!q.empty())
     {
-        int sol = pq.top();
-        pq.pop();
+        int cur = q.front();
+        q.pop();
 
-        ind[sol] = -1;
-
-        cout << sol << " ";
-
-        for (int i : deg[sol])
+        for (pair i : tree[cur])
         {
-            ind[i]--;
-            if (ind[i] == 0)
+            if (totd[i.first] == 0 && i.first != st)
             {
-                pq.push(i);
+                q.push(i.first);
+                totd[i.first] = totd[cur] + i.second;
+                if (totd[i.first] > maxdist)
+                {
+                    deepest = i.first;
+                    maxdist = totd[i.first];
+                }
             }
         }
     }
+    return deepest;
+}
+
+void solve()
+{
+    totd.resize(V + 1, 0);
+    int st = bfs(1);
+
+    for (int i = 0; i <= V; i++)
+    {
+        totd[i] = 0;
+    }
+    maxdist = 0;
+
+    bfs(st);
+    cout << maxdist;
 }
 
 int main(void)
@@ -77,7 +100,8 @@ int main(void)
     solve();
 }
 /*
-1766
+1167
 
-위상정렬만 사용하면 간단하게 풀리는 문제, 대체 왜 골드2인지 의문.
+2차원 벡터 만들어 버리면 시간과 메모리 초과 가능성 높음.
+간단한 지식 하나만으로 쉽게 풀리는 문제
 */
