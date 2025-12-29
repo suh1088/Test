@@ -9,98 +9,62 @@
 #include <map>
 #include <deque>
 #include <set>
+#include <iomanip>
 
 #define IMAX 0x7FFFFFFF
 
 using namespace std;
 typedef long long ll;
 
-struct r
-{
-    int a, b, c;
-
-    r(int a, int b, int c) : a(a), b(b), c(c) {};
-
-    bool operator<(const r &other) const
-    {
-        return this->c > other.c;
-    }
-};
-
 int N, M;
-vector<int> p;
-priority_queue<r> pq;
-int cost = 0;
-int mc = 0;
+vector<int> ind;
+vector<vector<int>> deg;
+priority_queue<int, vector<int>, greater<int>> pq;
 
 void input()
 {
     cin >> N >> M;
 
-    p.resize(N + 1, 0);
+    ind.resize(N + 1, 0);
+    deg.resize(N + 1);
 
-    for (int i = 0; i <= N; i++)
+    for (int i = 0; i < M; ++i)
     {
-        p[i] = i;
+        int a, b;
+        cin >> a >> b;
+        ind[b]++;
+        deg[a].push_back(b);
     }
 
-    for (int i = 0; i < M; i++)
+    for (int i = 1; i <= N; i++)
     {
-        int a, b, c;
-        cin >> a >> b >> c;
-        pq.push(r(a, b, c));
-    }
-}
-
-int find(int a)
-{
-    if (p[a] == a)
-    {
-        return a;
-    }
-    return p[a] = find(p[a]);
-}
-
-int ss(int a, int b)
-{
-    return find(a) == find(b);
-}
-
-int uni(int a, int b)
-{
-    if (ss(a, b))
-    {
-        return 0;
-    }
-    else
-    {
-        p[find(a)] = find(b);
-        return 1;
+        if (ind[i] == 0)
+        {
+            pq.push(i);
+        }
     }
 }
 
-void kruskal()
+void solve()
 {
-
     while (!pq.empty())
     {
-        r tmpr = pq.top();
-        int a = tmpr.a;
-        int b = tmpr.b;
-        int c = tmpr.c;
+        int sol = pq.top();
         pq.pop();
 
-        if (uni(a, b))
+        ind[sol] = -1;
+
+        cout << sol << " ";
+
+        for (int i : deg[sol])
         {
-            cost += c;
-            if (mc < c)
+            ind[i]--;
+            if (ind[i] == 0)
             {
-                mc = c;
+                pq.push(i);
             }
         }
     }
-
-    cost -= mc;
 }
 
 int main(void)
@@ -110,13 +74,10 @@ int main(void)
 
     input();
 
-    kruskal();
-
-    cout << cost;
+    solve();
 }
-
 /*
-1647
+1766
 
-최소 스패닝 트리를 찾은 뒤에 가장 비싼 길을 제거?
+위상정렬만 사용하면 간단하게 풀리는 문제, 대체 왜 골드2인지 의문.
 */
