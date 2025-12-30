@@ -16,78 +16,73 @@
 using namespace std;
 typedef long long ll;
 
-int V;
-vector<vector<pair<int, int>>> tree;
-// vector<vector<int>> dist;
-vector<int> totd;
-int maxdist = 0;
+int N, Midx = 0;
+vector<int> prisum; // idx 번쨰 소수까지의 합
+vector<int> pri;
 
-void input()
+void setpri()
 {
-    cin >> V;
-    tree.resize(V + 1);
-    // dist.resize(V + 1, vector<int>(V + 1));
+    pri.resize(N + 1, 1);
+    pri[0] = pri[1] = 0;
 
-    for (int i = 1; i <= V; i++)
+    for (int i = 2; i <= N; i++)
     {
-        int s;
-        cin >> s;
-
-        int to, d;
-        while (1)
+        if (pri[i])
         {
-            cin >> to;
-            if (to == -1)
-                break;
-
-            cin >> d;
-            tree[s].push_back(make_pair(to, d));
-            // dist[s][to] = d;
-        }
-    }
-}
-
-int bfs(int st)
-{ // return deepest node
-    queue<int> q;
-    q.push(st);
-    int deepest;
-
-    while (!q.empty())
-    {
-        int cur = q.front();
-        q.pop();
-
-        for (pair i : tree[cur])
-        {
-            if (totd[i.first] == 0 && i.first != st)
+            for (int j = 2; i * j <= N; j++)
             {
-                q.push(i.first);
-                totd[i.first] = totd[cur] + i.second;
-                if (totd[i.first] > maxdist)
-                {
-                    deepest = i.first;
-                    maxdist = totd[i.first];
-                }
+                pri[i * j] = 0;
             }
         }
     }
-    return deepest;
 }
 
-void solve()
+int chkpri(int n)
 {
-    totd.resize(V + 1, 0);
-    int st = bfs(1);
+    return pri[n];
+}
 
-    for (int i = 0; i <= V; i++)
+void input()
+{
+    cin >> N;
+    prisum.push_back(0);
+    setpri();
+    for (int i = 2; i <= N; i++)
     {
-        totd[i] = 0;
+        if (chkpri(i))
+        {
+            prisum.push_back(prisum.back() + i);
+            Midx++;
+        }
     }
-    maxdist = 0;
+}
 
-    bfs(st);
-    cout << maxdist;
+int solve()
+{
+    int ans = 0;
+    int l = 0;
+    int r = 0;
+
+    while (r <= Midx)
+    {
+        int tmp = prisum[r] - prisum[l];
+        if (tmp == N)
+        {
+            ans++;
+            l++;
+        }
+
+        else if (tmp > N)
+        {
+            l++;
+        }
+        else if (tmp < N)
+        {
+            r++;
+        }
+    }
+
+    return ans;
 }
 
 int main(void)
@@ -97,11 +92,10 @@ int main(void)
 
     input();
 
-    solve();
+    cout << solve();
 }
 /*
-1167
+1644
 
-2차원 벡터 만들어 버리면 시간과 메모리 초과 가능성 높음.
-간단한 지식 하나만으로 쉽게 풀리는 문제
+에라토스테네스의 체 + 투 포인터
 */
