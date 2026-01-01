@@ -16,73 +16,84 @@
 using namespace std;
 typedef long long ll;
 
-int N, Midx = 0;
-vector<int> prisum; // idx 번쨰 소수까지의 합
-vector<int> pri;
+int N, M, ans;
+vector<vector<int>> dm; // U D R L
+vector<int> par;
+int dx[4] = {0, 0, 1, -1};
+int dy[4] = {-1, 1, 0, 0};
 
-void setpri()
+int find(int a)
 {
-    pri.resize(N + 1, 1);
-    pri[0] = pri[1] = 0;
-
-    for (int i = 2; i <= N; i++)
+    if (par[a] == a)
     {
-        if (pri[i])
-        {
-            for (int j = 2; i * j <= N; j++)
-            {
-                pri[i * j] = 0;
-            }
-        }
+        return a;
     }
+    return par[a] = find(par[a]);
 }
 
-int chkpri(int n)
+void uni(int a_, int b_)
 {
-    return pri[n];
+    int a = find(a_);
+    int b = find(b_);
+    if (a == b)
+    {
+        return;
+    }
+    par[a] = b;
+    ans--;
+}
+
+int idx(int r, int c)
+{
+    return r * M + c;
 }
 
 void input()
 {
-    cin >> N;
-    prisum.push_back(0);
-    setpri();
-    for (int i = 2; i <= N; i++)
+    cin >> N >> M;
+    dm.resize(N, vector<int>(M, 0));
+    par.resize(N * M);
+    ans = N * M;
+
+    for (int i = 0; i < N; i++)
     {
-        if (chkpri(i))
+        for (int j = 0; j < M; j++)
         {
-            prisum.push_back(prisum.back() + i);
-            Midx++;
+            char c;
+            cin >> c;
+            switch (c)
+            {
+            case 'U':
+                dm[i][j] = 0;
+                break;
+            case 'D':
+                dm[i][j] = 1;
+                break;
+            case 'R':
+                dm[i][j] = 2;
+                break;
+            case 'L':
+                dm[i][j] = 3;
+                break;
+            }
         }
+    }
+
+    for (int i = 0; i < N * M; i++)
+    {
+        par[i] = i;
     }
 }
 
-int solve()
+void solve()
 {
-    int ans = 0;
-    int l = 0;
-    int r = 0;
-
-    while (r <= Midx)
+    for (int i = 0; i < N; i++)
     {
-        int tmp = prisum[r] - prisum[l];
-        if (tmp == N)
+        for (int j = 0; j < M; j++)
         {
-            ans++;
-            l++;
-        }
-
-        else if (tmp > N)
-        {
-            l++;
-        }
-        else if (tmp < N)
-        {
-            r++;
+            uni(idx(i, j), idx(i + dy[dm[i][j]], j + dx[dm[i][j]]));
         }
     }
-
-    return ans;
 }
 
 int main(void)
@@ -92,10 +103,12 @@ int main(void)
 
     input();
 
-    cout << solve();
+    solve();
+
+    cout << ans;
 }
 /*
-1644
+16724
 
-에라토스테네스의 체 + 투 포인터
+구현은 간단하지만 약간의 발상이 필요한 문제
 */
