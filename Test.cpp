@@ -16,11 +16,10 @@
 using namespace std;
 typedef long long ll;
 
-int N, M, ans;
-vector<vector<int>> dm; // U D R L
+int N, M, K;
 vector<int> par;
-int dx[4] = {0, 0, 1, -1};
-int dy[4] = {-1, 1, 0, 0};
+vector<int> card;
+vector<int> prin;
 
 int find(int a)
 {
@@ -28,6 +27,7 @@ int find(int a)
     {
         return a;
     }
+
     return par[a] = find(par[a]);
 }
 
@@ -35,64 +35,63 @@ void uni(int a_, int b_)
 {
     int a = find(a_);
     int b = find(b_);
+
     if (a == b)
     {
         return;
     }
-    par[a] = b;
-    ans--;
-}
-
-int idx(int r, int c)
-{
-    return r * M + c;
+    else if (a > b)
+    {
+        par[b] = a;
+    }
+    else if (a < b)
+    {
+        par[a] = b;
+    }
 }
 
 void input()
 {
-    cin >> N >> M;
-    dm.resize(N, vector<int>(M, 0));
-    par.resize(N * M);
-    ans = N * M;
+    cin >> N >> M >> K;
 
-    for (int i = 0; i < N; i++)
+    par.resize(N + 1, -1);
+    for (int i = 0; i < M; i++)
     {
-        for (int j = 0; j < M; j++)
-        {
-            char c;
-            cin >> c;
-            switch (c)
-            {
-            case 'U':
-                dm[i][j] = 0;
-                break;
-            case 'D':
-                dm[i][j] = 1;
-                break;
-            case 'R':
-                dm[i][j] = 2;
-                break;
-            case 'L':
-                dm[i][j] = 3;
-                break;
-            }
-        }
+        int c;
+        cin >> c;
+
+        par[c] = c;
+        card.push_back(c);
     }
 
-    for (int i = 0; i < N * M; i++)
+    sort(card.begin(), card.end());
+    int s = 0;
+    for (int i : card)
     {
-        par[i] = i;
+        for (int j = s; j < i; j++)
+        {
+            par[j] = i;
+        }
+        s = i + 1;
+    }
+    par[s] = s;
+
+    for (int i = 0; i < K; i++)
+    {
+        int c;
+        cin >> c;
+
+        int out = find(c + 1);
+        prin.push_back(out);
+        uni(out, out + 1);
     }
 }
 
 void solve()
 {
-    for (int i = 0; i < N; i++)
+    for (int i : prin)
     {
-        for (int j = 0; j < M; j++)
-        {
-            uni(idx(i, j), idx(i + dy[dm[i][j]], j + dx[dm[i][j]]));
-        }
+        cout << i << "\n";
     }
 }
 
@@ -104,11 +103,10 @@ int main(void)
     input();
 
     solve();
-
-    cout << ans;
 }
 /*
-16724
+16566
 
-구현은 간단하지만 약간의 발상이 필요한 문제
+= 랑 == 혼동 주의
+유니온 파인드 아이디어만 떠올리면 쉬운 문제인데 구현 과정에서 실수가 너무 많다
 */
