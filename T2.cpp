@@ -1,100 +1,87 @@
 #include <iostream>
+#include <cstdio>
 #include <vector>
-#include <string>
-#include <algorithm>
-#include <ctime>
-#include <cmath>
-#include <queue>
-#include <unordered_map>
-#include <map>
-#include <deque>
-#include <set>
 
 using namespace std;
-typedef long long ll;
 
-int N;
-vector<vector<int>> plate;
-map<int, bool> av1; // 차 일정
-map<int, bool> av2; // 합 일정
-vector<int> best(2, 0);
-
-bool chk(int x, int y)
+bool isNonIncreasing(vector<int> &arr)
 {
-    bool tmp = true;
-    if (x < 0 || x >= N)
-        tmp = false;
-    if (y < 0 || y >= N)
-        tmp = false;
-    return tmp;
-}
-
-int sol(int dia, int bish, int col)
-{
-
-    if (dia > N * 2 - 1)
+    for (int i = 0; i < (int)arr.size() - 1; i++)
     {
-        best[col] = max(bish, best[col]);
-        return bish;
-    } // ending
-
-    int x, y;
-    if (dia < N)
-    {
-        x = dia;
-        y = 0;
-    }
-    else
-    {
-        x = N - 1;
-        y = dia - N + 1;
-    } // find first pos
-
-    while (chk(x, y))
-    {
-
-        if (plate[x][y] == 1 && av1[x - y] && av2[x + y])
+        if (arr[i] > arr[i + 1])
         {
-            plate[x][y] = 2;
-            av1[x - y] = false;
-            av2[x + y] = false;
-
-            sol(dia + 2, bish + 1, col);
-
-            plate[x][y] = 1;
-            av1[x - y] = true;
-            av2[x + y] = true;
-        }
-
-        x--;
-        y++;
-    }
-    // 배치하지 않고 넘어가는 경우
-    sol(dia + 2, bish, col);
-
-    return bish;
-}
-
-int main(void)
-{
-    // ios::sync_with_stdio(false);
-    // cin.tie(NULL);
-
-    // cin >> N;
-    plate.resize(N, vector<int>(N));
-
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            cin >> plate[i][j];
-            av1[i - j] = true;
-            av2[i + j] = true;
+            return true; // 단조증가하지 않음
         }
     }
+    return false; // 단조증가
+}
 
-    // sol(0,0)
-    sol(0, 0, 0);
-    sol(1, 0, 1);
-    cout << best[0] + best[1];
+vector<int> performOperation(vector<int> arr, int pos)
+{
+    arr[pos] = arr[pos] ^ arr[pos + 1];
+    arr.erase(arr.begin() + pos + 1);
+    return arr;
+}
+
+bool canAchieveInK(vector<int> arr, int k)
+{
+    if (k == 0)
+    {
+        return isNonIncreasing(arr);
+    }
+
+    if (arr.size() == 1)
+        return false;
+
+    // k번 연산으로 가능한 모든 경우 탐색 (BFS 또는 DFS)
+    // 간단한 구현: 각 단계에서 모든 위치 시도
+    for (int pos = 0; pos < (int)arr.size() - 1; pos++)
+    {
+        vector<int> next = performOperation(arr, pos);
+        if (canAchieveInK(next, k - 1))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+int main(int argc, char **argv)
+{
+    int T;
+    freopen("input.txt", "r", stdin);
+    cin >> T;
+
+    for (int test_case = 1; test_case <= T; ++test_case)
+    {
+        int N;
+        cin >> N;
+        vector<int> arr(N);
+
+        for (int i = 0; i < N; i++)
+        {
+            cin >> arr[i];
+        }
+
+        // 이미 단조증가하지 않으면 답은 0
+        if (isNonIncreasing(arr))
+        {
+            cout << 0 << '\n';
+            continue;
+        }
+
+        // k = 1부터 N-1까지 시도
+        int answer = -1;
+        for (int k = 1; k < N; k++)
+        {
+            if (canAchieveInK(arr, k))
+            {
+                answer = k;
+                break;
+            }
+        }
+
+        cout << answer << '\n';
+    }
+    return 0;
 }
