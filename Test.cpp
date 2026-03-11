@@ -16,351 +16,69 @@
 using namespace std;
 typedef long long ll;
 
-class cord{
-    public:
-    int r, c;
-    cord(){
-        r = -1;
-        c = -1;
-    }
-    cord(int a, int b){
-        r = a;
-        c = b;
-    }
-};
-
-class pos{
-    public:
-    cord R;
-    cord B;
-    int time = 0;
-    bool valid = true;
-    bool blue = false;
-    pos();
-    pos(cord& a, cord& b, int t){
-        R = a;
-        B = b;
-        time = t;
-    }
-};
-
 
 int N, M;
-vector<vector<char>> board;
-queue<pos*> q;
+int arr[101][101];
+int ans = 0;
 
-vector<cord> mov = {cord(-1, 0), cord(1, 0), cord(0, -1), cord(0, -1)};
-
-bool chk(int r, int c, cord& oth){
-    if((0 > r || N <= r) || (0 > c || M <= c)) return false;
-    if(board[r][c] == '#') return false;
-    if(board[r][c] == 'O') return true;
-    bool tmp = true;
-    tmp &= (oth.r != r || oth.c != c);
-    return tmp;
-}
-
-pos* up(pos* tmp){
-    pos* cur = new pos(tmp->R, tmp->B, tmp->time);
-    if(cur->B.r < cur->R.r){
-        while(chk(cur->B.r - 1, cur->B.c, cur->R)){
-            cur->B.r--;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->R.r - 1, cur->R.c, cur->B)){
-            cur->R.r--;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-
-                break;
-                // return cur;
-            }
-        }
-    }
-    else{
-        while(chk(cur->R.r - 1, cur->R.c, cur->B)){
-            cur->R.r--;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-     
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->B.r - 1,cur->B.c, cur->R)){
-            cur->B.r--;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-        }
-    }
-    cur->time++;
-    return cur;
-}
-
-pos* down(pos* tmp){
-    pos* cur = new pos(tmp->R, tmp->B, tmp->time);
-    if(cur->B.r > cur->R.r){
-        while(chk(cur->B.r + 1,cur->B.c, cur->R)){
-            cur->B.r++;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->R.r + 1,cur->R.c, cur->B)){
-            cur->R.r++;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-          
-                break;
-                // return cur;
-            }
-        }
-    }
-    else{
-        while(chk(cur->R.r + 1,cur->R.c, cur->B)){
-            cur->R.r++;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-          
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->B.r + 1,cur->B.c, cur->R)){
-            cur->B.r++;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-        }
-    }
-    cur->time++;
-    return cur;
-}
-
-pos* left_(pos* tmp){
-    pos* cur = new pos(tmp->R, tmp->B, tmp->time);
-    if(cur->B.c < cur->R.c){
-        while(chk(cur->B.r,cur->B.c - 1, cur->R)){
-            cur->B.c--;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->R.r,cur->R.c - 1, cur->B)){
-            cur->R.c--;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-       
-                break;
-                // return cur;
-            }
-        }
-    }
-    else{
-        while(chk(cur->R.r,cur->R.c - 1, cur->B)){
-            cur->R.c--;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-       
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->B.r,cur->B.c - 1, cur->R)){
-            cur->B.c--;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-            
-        }
-    }
-    cur->time++;
-    return cur;
-}
-
-pos* right_(pos* tmp){
-    pos* cur = new pos(tmp->R, tmp->B, tmp->time);
-    if(cur->B.c > cur->R.c){
-        while(chk(cur->B.r,cur->B.c + 1, cur->R)){
-            cur->B.c++;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->R.r,cur->R.c + 1, cur->B)){
-            cur->R.c++;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-   
-                break;
-                // return cur;
-            }
-        }
-    }
-    else{
-        while(chk(cur->R.r,cur->R.c + 1, cur->B)){
-            cur->R.c++;
-            if(board[cur->R.r][cur->R.c] == 'O'){
-                cur->valid = false;
-            
-                break;
-                // return cur;
-            }
-        }
-        while(chk(cur->B.r,cur->B.c + 1, cur->R)){
-            cur->B.c++;
-            if(board[cur->B.r][cur->B.c] == 'O'){
-                cur->valid = false;
-                cur->blue = true;
-                break;
-                // return cur;
-            }
-        }
-    }
-    cur->time++;
-    return cur;
-}
-
-int main(void){
-    ios::sync_with_stdio(false); 
-    cin.tie(NULL);
-
+int main() {
+    // 입력: N(격자 크기), M(연속으로 같은 값이 필요한 최소 길이)
     cin >> N >> M;
-    board.resize(N, vector<char>(M, 0));
 
-    cord red, b;
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            char tmp;
-            cin >> tmp;
-            if(tmp == 'R'){
-                red = cord(i, j);
-                board[i][j] = '.';
-            }
-            else if(tmp == 'B'){
-                b = cord(i, j);
-                board[i][j] = '.';
-
-            }
-            else{
-                board[i][j] = tmp;
-            }
+    // N x N 격자 입력
+    for (int r = 0; r < N; r++) {
+        for (int c = 0; c < N; c++) {
+            cin >> arr[r][c];
         }
     }
-    pos* init = new pos(red, b, 0);
 
-    q.push(init);
+    // 한 "직선 라인"(행/열)에서 같은 값이 연속으로 M개 이상 있는지 검사한다.
+    // (sr, sc)에서 시작해서 (dr, dc) 방향으로 N칸을 순회한다.
+    auto lineHasRunAtLeastM = [&](int sr, int sc, int dr, int dc) -> bool {
+        // M == 1이면 어떤 행/열이든(원소가 존재하는 한) 조건을 만족한다.
+        if (M <= 1) return true;
 
-    
+        int prev = arr[sr][sc];
+        int runLen = 1;
 
-    while(!q.empty()){
-        pos* tmp = q.front();
-        q.pop();
+        for (int step = 1; step < N; ++step) {
+            const int r = sr + dr * step;
+            const int c = sc + dc * step;
 
-        if(tmp->time > 10){
-            cout << -1;
-            return 0;
-        }
-
-        pos* u;
-        pos* d;
-        pos* l;
-        pos* r;
-
-        u = up(tmp);
-        d = down(tmp);
-        l = left_(tmp);
-        r = right_(tmp);
-
-        if(u->valid){
-            q.push(u);
-        }
-        else{
-            if(!u->blue && u->time < 11){
-                cout << u->time;
-                return 0;
-            }
-            else{
-                delete u;
+            if (arr[r][c] == prev) {
+                ++runLen;
+                // 목표 길이에 도달하면 더 볼 필요 없이 즉시 성공
+                if (runLen >= M) return true;
+            } else {
+                // 값이 바뀌면 연속 길이를 1로 초기화
+                prev = arr[r][c];
+                runLen = 1;
             }
         }
+        return false;
+    };
 
-        if(d->valid){
-            q.push(d);
-        }
-        else{
-            if(!d->blue && d->time < 11){
-                cout << d->time;
-                return 0;
-            }
-            else{
-                delete d;
-            }
-        }
+    // 결과는 main 한 번 실행 기준으로 0부터 다시 센다.
+    ans = 0;
 
-        if(l->valid){
-            q.push(l);
+    // 1) 각 행이 조건을 만족하는지 검사
+    for (int r = 0; r < N; r++) {
+        if (lineHasRunAtLeastM(r, 0, 0, 1)) {
+            ans++;
         }
-        else{
-            if(!l->blue && l->time < 11){
-                cout << l->time;
-                return 0;
-            }
-            else{
-                delete l;
-            }
-        }
-
-        if(r->valid){
-            q.push(r);
-        }
-        else{
-            if(!r->blue && r->time < 11){
-                cout << r->time;
-                return 0;
-            }
-            else{
-                delete r;
-            }
-        }
-
-        delete tmp;
     }
-    cout << -1;
+
+    // 2) 각 열이 조건을 만족하는지 검사
+    for (int c = 0; c < N; c++) {
+        if (lineHasRunAtLeastM(0, c, 1, 0)) {
+            ans++;
+        }
+    }
+
+    cout << ans;
     return 0;
 }
 
 /*
-13460
 
-진짜 역대급으로 오래걸렸다. 
-이것저것 실수한거 고치느라 거의 3시간 걸린듯
-
-먼저 전략 세우고
-깔끔한 구현방향 고민하고
-손 움직이기
 */
