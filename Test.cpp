@@ -16,69 +16,154 @@
 using namespace std;
 typedef long long ll;
 
+struct status{
+    int i, j, jump, time;
 
-int N, M;
-int arr[101][101];
-int ans = 0;
+    status(int s1, int s2, int jump, int time)
+        : i(s1), j(s2), jump(jump), time(time) {}
 
-int main() {
-    // 입력: N(격자 크기), M(연속으로 같은 값이 필요한 최소 길이)
-    cin >> N >> M;
+    bool operator<(const status& s) const{
+        return time > s.time;
+    }
+};
 
-    // N x N 격자 입력
-    for (int r = 0; r < N; r++) {
-        for (int c = 0; c < N; c++) {
-            cin >> arr[r][c];
-        }
+int t[51][51][6];
+char m[51][51];
+int N, Q;
+
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,1,-1};
+
+bool chk(int s1, int s2, int dir, int jmp){
+    int d1 = s1 + dx[dir]*jmp;
+    int d2 = s2 + dy[dir]*jmp;
+    if(d1 < 1 || d1 > N || d2 < 1 || d2 > N){
+        return false;
     }
 
-    // 한 "직선 라인"(행/열)에서 같은 값이 연속으로 M개 이상 있는지 검사한다.
-    // (sr, sc)에서 시작해서 (dr, dc) 방향으로 N칸을 순회한다.
-    auto lineHasRunAtLeastM = [&](int sr, int sc, int dr, int dc) -> bool {
-        // M == 1이면 어떤 행/열이든(원소가 존재하는 한) 조건을 만족한다.
-        if (M <= 1) return true;
-
-        int prev = arr[sr][sc];
-        int runLen = 1;
-
-        for (int step = 1; step < N; ++step) {
-            const int r = sr + dr * step;
-            const int c = sc + dc * step;
-
-            if (arr[r][c] == prev) {
-                ++runLen;
-                // 목표 길이에 도달하면 더 볼 필요 없이 즉시 성공
-                if (runLen >= M) return true;
-            } else {
-                // 값이 바뀌면 연속 길이를 1로 초기화
-                prev = arr[r][c];
-                runLen = 1;
+    if(s1 == d1){
+        int jMin = min(s2, d2), jMax = max(s2, d2);
+        for(int j = jMin; j < jMax; j++){
+            if(m[s1][j] == '#'){
+                return false;
             }
         }
-        return false;
-    };
-
-    // 결과는 main 한 번 실행 기준으로 0부터 다시 센다.
-    ans = 0;
-
-    // 1) 각 행이 조건을 만족하는지 검사
-    for (int r = 0; r < N; r++) {
-        if (lineHasRunAtLeastM(r, 0, 0, 1)) {
-            ans++;
+        if(m[d1][d2] == '.'){
+            return true;
         }
+        else return false;
+    }
+    else{ // diff
+        int iMin = min(s1, d1), iMax = max(s1, d1);
+        for(int i = iMin; i < iMax; i++){
+            if(m[i][s2] == '#'){
+                return false;
+            }
+        }
+        if(m[d1][d2] == '.'){
+            return true;
+        }
+        else return false;
     }
 
-    // 2) 각 열이 조건을 만족하는지 검사
-    for (int c = 0; c < N; c++) {
-        if (lineHasRunAtLeastM(0, c, 1, 0)) {
-            ans++;
+    return false;
+}
+
+int djk(int s1, int s2){
+    priority_queue<status> pq;
+
+    t[s1][s2][1] = 0;
+    pq.push(status(s1, s2, 1, 0));
+
+    while(!pq.empty()){
+        status tmp = pq.top();
+        pq.pop();
+        int curi=tmp.i;
+        int curj=tmp.j;
+        int jmp=tmp.jump;
+        int curtime=tmp.time;
+
+        if(curtime > t[curi][curj][jmp]){
+            continue;
+        }
+
+        //jmp
+        for(int i = 0; i < 4; i++){
+            int d2 = curj+dy[i]*jmp;
+            int d1 = curi+dx[i]*jmp;
+            
+            if(chk(curi, curj, i, jmp) && t[d1][d2][jmp] > curtime + 1){
+                t[d1][d2][jmp] = curtime + 1;
+                pq.push(status(d1, d2, jmp, curtime + 1));
+
+            }
+        }
+
+        //inc
+        if(jmp < 5){
+            int newTime = curtime + (jmp+1)*(jmp+1);
+            if(t[curi][curj][jmp+1] > newTime){
+                t[curi][curj][jmp+1] = newTime;
+                pq.push(status(curi, curj, jmp+1, newTime));
+            }
+        }
+        //dec
+        if(jmp > 1){
+            int newTime = curtime + 1;
+            for(int newjmp = 1; newjmp <= jmp-1; newjmp++){
+                if(t[curi][curj][newjmp] > newTime){
+                    t[curi][curj][newjmp] = newTime;
+                    pq.push(status(curi, curj, newjmp, newTime));
+                }
+            }
+            
         }
     }
-
-    cout << ans;
     return 0;
 }
 
+int main() {
+    cin >> N;
+
+    for(int i = 1; i <= N;i++){
+        // for(int j = 1; j <= N; j++){
+        //     cin >> m[i];
+            
+        // }
+        cin >> (m[i] + 1);
+    }
+
+    cin >> Q;
+    while(Q--){
+        for(int i = 1; i <= N;i++){
+            for(int j = 1; j <= N; j++){
+                for(int k = 0; k<6; k++){
+                    t[i][j][k] = IMAX;
+                }
+            }
+        }
+
+        int s1, s2, d1, d2;
+        cin >> s1 >> s2 >> d1 >> d2;
+        
+        djk(s1, s2);
+
+        int minimum = IMAX;
+        for(int k = 0; k<6; k++){
+            if(minimum > t[d1][d2][k]){
+                minimum = t[d1][d2][k];
+            }
+        }
+
+        if(minimum == IMAX){
+            cout << -1 << '\n';
+        }
+        else{
+            cout << minimum << '\n';
+        }
+    }
+}
+
 /*
-not add and commit on test1
+
 */
