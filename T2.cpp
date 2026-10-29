@@ -6,50 +6,53 @@
 using namespace std;
 typedef long long ll;
 
-int N;
-vector<int> c1, c2;
+int N, M;
+vector<vector<int>> grid;
 
-vector<vector<int>> dp;
+int dist(int x, int y, int a, int b){
+    return abs(a-x)+abs(b-y);
+}
 
 int main() {
     // ios::sync_with_stdio(false);
     // cin.tie(0);
 
-    cin >> N;
+    cin >> N >> M;
 
-    c1.resize(N,0);
-    c2.resize(N,0);
-    dp.resize(N+1,vector<int>(N+1,-1));
+    grid.resize(N,vector<int>(N,0));
+    int ans = 0;
 
-    for(int i = 0;i<N;i++){
-        cin >> c1[i];
-    }
-    for(int i = 0;i<N;i++){
-        cin >> c2[i];
-    }
-
-    dp[0][0] = 0;
-
-    for(int i=0;i<N;i++){
-        for(int j=0;j<N;j++){
-            if(c1[i] == c2[j]){
-                dp[i+1][j+1] = max(dp[i][j], dp[i+1][j+1]);
-            }
-            else if(c1[i] < c2[j]){
-                dp[i+1][j] = max(dp[i][j], dp[i+1][j]);
-            }
-            else if(c1[i] > c2[j]){
-                dp[i][j+1] = max(dp[i][j] + c2[j], dp[i][j+1]);
-            }
-            dp[i+1][j+1] = max(dp[i][j], dp[i+1][j+1]);
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            cin >> grid[i][j];
         }
     }
 
-    int ans = 0;
 
-    for(int i=0;i<=N;i++){
-        ans = max(ans, dp[i][N]);
-        ans = max(ans, dp[N][i]);
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            
+            
+
+            for(int k =0;k <= N; k++){ // k 범위
+                int cost, gold=0, gn=0;
+                cost = k*k+(k+1)*(k+1);
+            
+
+                for(int x = 0; x < N; x++){
+                    for(int y = 0; y < N; y++){
+                        if(dist(i,j,x,y) <= k && grid[x][y]){
+                            gold += M;
+                            gn++;
+                        }
+                    }
+                }
+
+                if(cost <= gold){
+                    ans = max(ans, gn);
+                }
+            }
+        }
     }
 
     cout << ans;
