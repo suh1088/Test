@@ -6,86 +6,51 @@
 using namespace std;
 typedef long long ll;
 
-int N, K;
-vector<vector<int>> grid;
-pair<int,int> cur;
+int N;
+vector<int> c1, c2;
 
-int dx[4] = {1,-1,0,0};
-int dy[4] = {0,0,1,-1};
-
-bool chk(int x, int y){
-    return (x >= 0 && x < N) && (y >= 0 && y < N);
-}
-
-int bfs(){
-    int thrs = grid[cur.first][cur.second];
-    vector<vector<int>> vis(N, vector<int>(N,0));
-    queue<pair<int,int>> q;
-    int found = 0;
-    
-    q.push(cur);
-    vis[cur.first][cur.second] = 1;
-    
-    while(!q.empty()){
-        pair<int,int> tmp = q.front();
-        q.pop();
-        
-        for(int i = 0; i < 4; i++){
-            int nx = tmp.first + dx[i], ny = tmp.second + dy[i];
-            
-            if(chk(nx, ny) && !vis[nx][ny] && grid[nx][ny] < thrs){
-                q.push({nx,ny});
-                vis[nx][ny]=1;
-                found++;
-            }
-        }
-    }
-
-
-    int candn = -1;
-    pair<int,int> candc;
-
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < N;j++){
-            if(vis[i][j] && candn < grid[i][j] && candn != thrs){
-                candn = grid[i][j];
-                candc = make_pair(i,j);
-
-            }
-        }
-    }
-
-    cur = candc;
-
-    return found;
-}
-
-void move(int cnt){
-    if(cnt == K) return;
-    // pair<int, int> cand;
-    if(!bfs()){
-        return;
-    }
-
-    move(cnt + 1);
-}
+vector<vector<int>> dp;
 
 int main() {
     // ios::sync_with_stdio(false);
     // cin.tie(0);
 
-    cin >> N >> K;
-    grid.resize(N, vector<int>(N,-1));
+    cin >> N;
 
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < N;j++){
-            cin >> grid[i][j];
+    c1.resize(N,0);
+    c2.resize(N,0);
+    dp.resize(N+1,vector<int>(N+1,-1));
+
+    for(int i = 0;i<N;i++){
+        cin >> c1[i];
+    }
+    for(int i = 0;i<N;i++){
+        cin >> c2[i];
+    }
+
+    dp[0][0] = 0;
+
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            if(c1[i] == c2[j]){
+                dp[i+1][j+1] = max(dp[i][j], dp[i+1][j+1]);
+            }
+            else if(c1[i] < c2[j]){
+                dp[i+1][j] = max(dp[i][j], dp[i+1][j]);
+            }
+            else if(c1[i] > c2[j]){
+                dp[i][j+1] = max(dp[i][j] + c2[j], dp[i][j+1]);
+            }
+            dp[i+1][j+1] = max(dp[i][j], dp[i+1][j+1]);
         }
     }
 
-    cin >> cur.first >> cur.second;
+    int ans = 0;
 
-    move(0);
+    for(int i=0;i<=N;i++){
+        ans = max(ans, dp[i][N]);
+        ans = max(ans, dp[N][i]);
+    }
 
-    cout << cur.first << " " << cur.second;
-}
+    cout << ans;
+}   
