@@ -8,9 +8,17 @@ typedef long long ll;
 
 int N, M;
 vector<vector<int>> grid;
+vector<vector<int>> sum;
+vector<tuple<int, pair<int, int>, pair<int,int>>> recs;
 
-int dist(int x, int y, int a, int b){
-    return abs(a-x)+abs(b-y);
+int rec(int i, int j, int ii, int jj){
+    int result = sum[ii][jj];
+
+    if(i > 0) result -= sum[i-1][jj];
+    if(j > 0) result -= sum[ii][j-1];
+    if(i > 0 && j > 0) result += sum[i-1][j-1];
+
+    return result;
 }
 
 int main() {
@@ -19,37 +27,44 @@ int main() {
 
     cin >> N >> M;
 
-    grid.resize(N,vector<int>(N,0));
-    int ans = 0;
+    grid.resize(N, vector<int>(M,0));
+    sum.resize(N, vector<int>(M,0));
 
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            cin >> grid[i][j];
+    for(int i=0;i<N;i++){
+        for(int j=0;j<M;j++){
+            int tmp;
+            cin >> tmp;
+            grid[i][j] = tmp>0?1:0;
         }
     }
 
+    sum[0][0]=grid[0][0];
 
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            
-            
+    for(int i=0;i<N;i++){
+        for(int j=0;j<M;j++){
+            if(!i&&!j){
+                continue;
+            }
+            else if(!i){
+                sum[i][j]=sum[i][j-1] + grid[i][j];
+            }
+            else if(!j){
+                sum[i][j]=sum[i-1][j] + grid[i][j];
+            }
+            else{
+                sum[i][j]= sum[i-1][j]+ sum[i][j-1] + grid[i][j] - sum[i-1][j-1];
+            }
+        }
+    }
 
-            for(int k =0;k <= N; k++){ // k 범위
-                int cost, gold=0, gn=0;
-                cost = k*k+(k+1)*(k+1);
-            
-
-                for(int x = 0; x < N; x++){
-                    for(int y = 0; y < N; y++){
-                        if(dist(i,j,x,y) <= k && grid[x][y]){
-                            gold += M;
-                            gn++;
-                        }
+    int ans = -1;
+    for(int i=0;i<N;i++){
+        for(int j=0;j<M;j++){
+            for(int ii=i;ii<N;ii++){
+                for(int jj=j;jj<M;jj++){
+                    if(rec(i,j,ii,jj) == (ii-i + 1)*(jj-j+1)){
+                        ans = max(ans, rec(i,j,ii,jj));
                     }
-                }
-
-                if(cost <= gold){
-                    ans = max(ans, gn);
                 }
             }
         }
